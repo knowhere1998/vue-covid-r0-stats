@@ -1,38 +1,77 @@
 <template>
 	<div id="Content">
-		{{ activeData }}
+		<div class="selector" v-if="states">
+			{{ getStates }}
+			Select State: <v-select :options="getStates"></v-select>
+			
+		</div>
+		<div class="p-10" v-if="activeData">
+			<div class="flex">
+				<div class="w-1/2">
+					<LineChart
+						:chartData="drawChart(state.state, getDates, mapAccumulated(confirmedData, state.state), '#0000ff')" 
+						:options="chartOptions()"
+					/>
+					<LineChart
+						:chartData="drawChart(state.state, getDates, mapAccumulated(activeData, state.state), '#ff0000')" 
+						:options="chartOptions()"
+					/>
+					<LineChart
+						:chartData="drawChart(state.state, getDates, mapAccumulated(recoveredData, state.state), '#00ff00')" 
+						:options="chartOptions()"
+					/>
+				</div>
+				<div class="w-1/2 bg-green-100">
+					Current R-Nought:
+					/// TODO: Calculate R Nought
+				</div>
+			</div>
+		</div>
+		<div class="p-10" v-else>
+			No Records!
+		</div>
 		<!-- <label class="switch">
 			<input type="checkbox" v-model="checkToggle">
 			<span class="slider round"></span>
 		</label> -->
-<!-- 		<div v-for="state in confirmedData" :key="state.state" class="p-10">
-			<LineChart 
-				:chartdata="drawChart(state.state, state.dates, state.dailyCount)" 
-				:options="chartOptions()"
-			/>
 		</div>
- -->	</div>
 </template>
 
 <script>
 import axios from 'axios';
 import moment from 'moment';
-// import LineChart from './LineChart.vue'
-
+import LineChart from './LineChart.vue'
 
 export default{
 	components:{
-		// LineChart,
+		LineChart,
 	},
 	data() {
 		return {
+			states: null,
+			activeData: null,
+			confirmedData: null,
+			recoveredData: null,
+			deceasedData: null,
 			computeValues: false,
 			info: null,
 			checkToggle: false
 		}
 	},
 
-	async beforeCreate(){
+	async mounted(){
+		await axios
+			.get('https://api.covid19india.org/v2/state_district_wise.json')
+			.then(response => {
+				this.states = [];
+				response.data.forEach(state=>{
+					delete state.districtData;
+					state.statecode = state.statecode.toLowerCase();
+					this.states.push(state);
+				});
+			},
+			(error) => { console.log(error) }
+		);
 		await axios
 			.get('https://api.covid19india.org/states_daily.json')
 			.then(response => {
@@ -43,31 +82,70 @@ export default{
 		);
 	},
 
+	watch: {
+		computeValues: function () {
+			if (this.computeValues){
+				this.activeData = []; 
+				this.confirmedData = []; 
+				this.recoveredData = []; 
+				this.deceasedData = [];
+				this.getDates.forEach(date=>{
+					let confirmedDeltas = this.info.filter(entry=> {return entry.status === "Confirmed" && entry.date === date});
+					let recoveredDeltas = this.info.filter(entry=> {return entry.status === "Recovered" && entry.date === date});
+					let deceasedDeltas 	= this.info.filter(entry=> {return entry.status === "Deceased" && entry.date === date});
+					this.accumulateDeltas(confirmedDeltas[0], date, this.confirmedData);
+					this.accumulateDeltas(recoveredDeltas[0], date, this.recoveredData);
+					this.accumulateDeltas(deceasedDeltas[0], date, this.deceasedData);
+					this.accumulateActiveDeltas(date);
+				});
+			}
+		},
+	},
+
 	filters: {
 		toDate(value){
 			return moment(String(value)).format("DD/MM/YYYY");
-		}
+		},
+
+		state(data, stateName) {
+			if (data){
+				return data.filter(entry=> {return entry.state === stateName});
+			}
+			return null;
+		},
+
+		last(data){
+			return data.splice(-1)[0];
+		},
 	},
 
 	methods: {
-		pivotData(data) {
-			let keys = Object.keys(data[0]);
-			let pivotedData = [];
-			keys.forEach(key=>{
-				let obj = {'state': key, 'dates': [], 'dailyCount': [], 'accumulatedCount': []};
-				let total = Number(0);
-				data.forEach(item=>{
-					total += Number(item[key]);
-					obj['dates'].push(moment(item['date']).format("DD/MM/YY"));
-					obj['dailyCount'].push(Number(item[key]));
-					obj['accumulatedCount'].push(total);
-				});
-				pivotedData.push(obj);
+		accumulateDeltas(data, date, arr) {
+			this.states.forEach(state=>{
+				let delta = Number(data[state.statecode])
+				let filteredArr = arr.filter(entry=>{return entry.state === state.state});
+				let prev = Number((filteredArr.length > 0) ? filteredArr.slice(-1)[0]['accumulated']: 0);
+				let total = delta + prev
+				arr.push({"state": state.state, "date": date, "delta": delta, "accumulated": total});
 			});
-			return pivotedData;
 		},
 
-		drawChart(state, dates, dailyCount) {
+		accumulateActiveDeltas(date, arr = this.activeData) {
+				this.states.forEach(state=>{
+				let confirmedEntry 	= this.confirmedData.filter(entry=> {return entry.state === state.state && entry.date === date})[0];
+				let recoveredEntry 	= this.recoveredData.filter(entry=> {return entry.state === state.state && entry.date === date})[0];
+				let deceasedEntry 	= this.deceasedData.filter(entry=> {return entry.state === state.state && entry.date === date})[0];
+				let delta = Number(confirmedEntry.delta) - Number(recoveredEntry.delta) - Number(deceasedEntry.delta);
+				let total = Number(confirmedEntry.accumulated) - Number(recoveredEntry.accumulated) - Number(deceasedEntry.accumulated);
+				arr.push({"state": state.state, "date": date, "delta": delta, "accumulated": total});
+			});
+		},
+
+		mapAccumulated(data, state) {
+			return data.filter(record=>{return record['state'] === state}).map(x => { return x['accumulated']});
+		},
+
+		drawChart(state, dates, data, color) {
 			return {
 				labels: dates,
 				datasets: [{
@@ -75,26 +153,21 @@ export default{
 					height: 300,
 					width: 350,
 					backgroundColor: '#ddd',
-					borderColor: '#0000ff',
-					data: dailyCount
-				}]			
+					borderColor: color,
+					data: data
+				}]
 			};
 		},
+
 		chartOptions() {
 			return {
 				scales: {
 					yAxes: [{
-						ticks: {
-							beginAtZero: true
-						},
 						gridLines: {
 							color: "rgba(0, 0, 0, 0)",
 						}
 					}],
 					xAxes: [{
-						ticks: {
-							beginAtZero: true
-						},
 						gridLines: {
 							color: "rgba(0, 0, 0, 0)",
 						}
@@ -107,55 +180,6 @@ export default{
 	},
 
 	computed: {
-		confirmedData () {
-			if (this.computeValues) {
-				let data = this.info.filter(day=> {return day.status === "Confirmed"});
-				data.forEach(item=> delete item.status);
-				let pivotedData = this.pivotData(data);
-				return pivotedData;
-			}else{
-				return null;
-			}
-		},
-
-		deceasedData () {
-			if(this.computeValues) {
-				let data = this.info.filter(day=> {return day.status === "Deceased"});
-				data.forEach(item=> delete item.status);
-				let pivotedData = this.pivotData(data);
-				console.log("deceasedData");
-				console.log(pivotedData);
-				return pivotedData;
-			}
-			return null;
-		},
-
-		recoveredData () {
-			if(this.computeValues) {
-				let data = this.info.filter(day=> {return day.status === "Recovered"});
-				data.forEach(item=> delete item.status);
-				let pivotedData = this.pivotData(data);
-				console.log("revoveredData");
-				console.log(pivotedData);
-				return pivotedData;
-			}
-			return null;
-		},
-
-		activeData () {
-			if (this.computeValues){
-				let activeData = [];
-				let states = [];
-				let dates = this.getDates;
-				console.log(dates);
-				this.info.forEach(entry=>{
-					// if(dates[entry.date])
-				});
-				return activeData;
-			}
-			return null;
-		},
-
 		getDates () {
 			if(this.computeValues) {
 				let dates = new Set();
@@ -165,9 +189,13 @@ export default{
 				return Array.from(dates);
 			}
 			return null;
+		},
+
+		getStates() {
+			return this.states.map(x => x['state']).sort();
 		}
 	},
-}
+};
 </script>
 
 <style scoped>

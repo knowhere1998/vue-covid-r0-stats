@@ -5,6 +5,12 @@
 				Select State: 
 				<v-select multiple :options="getStates" v-model="selectedStates"></v-select>
 			</div>
+			bi-weekly
+			<label class="switch">
+				<input type="checkbox" v-model="rangeToggle">
+				<span class="slider round"></span>
+			</label>
+			monthly
 			<div v-if="selectedStates">
 				<div class="p-2" v-for="selectedState in selectedStates" :key="selectedState">
 					<h3 class="h-12 w-full text-center text-2xl">{{ selectedState }}</h3>
@@ -12,29 +18,26 @@
 						<div class="w-2/3 p-6">
 							<h4>Confirmed Cases</h4>
 							<LineChart class="p-6"
-								:chartData="drawChart(selectedState, getDates, mapAccumulated(confirmedData, selectedState), '#0000ff')" 
+								:chartData="drawChart(selectedState, dateList, mapAccumulated(confirmedData, selectedState, dateRange), '#0000ff')" 
 								:options="chartOptions()"
 								:height="200"
-								:width="auto"
 							/>
 							<h4>Active Cases</h4>
 							<LineChart
-								:chartData="drawChart(selectedState, getDates, mapAccumulated(activeData, selectedState), '#ff0000')" 
+								:chartData="drawChart(selectedState, dateList, mapAccumulated(activeData, selectedState, dateRange), '#ff0000')" 
 								:options="chartOptions()"
 								:height="200"
-								:width="auto"
 							/>
 							<h4>Recovered Cases</h4>
 							<LineChart
-								:chartData="drawChart(selectedState, getDates, mapAccumulated(recoveredData, selectedState), '#00ff00')" 
+								:chartData="drawChart(selectedState, dateList, mapAccumulated(recoveredData, selectedState, dateRange), '#00ff00')" 
 								:options="chartOptions()"
 								:height="200"
-								:width="auto"
 							/>
 						</div>
 						<div class="w-1/3 bg-green-100 p-10">
 							Current R-Nought:
-							/// TODO: Calculate R Nought
+							<div class="text-2xl p-32">{{ rNought(selectedState) }}</div>
 						</div>
 					</div>
 				</div>
@@ -42,18 +45,14 @@
 		</div>
 		<div class="p-10" v-else>
 			No Records!
-		</div>
-		<!-- <label class="switch">
-			<input type="checkbox" v-model="checkToggle">
-			<span class="slider round"></span>
-		</label> -->
-		</div>
+		</div>	
+	</div>
 </template>
 
 <script>
 import axios from 'axios';
 import moment from 'moment';
-import LineChart from './LineChart.vue'
+import LineChart from './LineChart.vue';
 
 export default{
 	components:{
@@ -66,6 +65,9 @@ export default{
 			confirmedData: null,
 			recoveredData: null,
 			deceasedData: null,
+			dateList: null,
+			dateRange: null,
+			rangeToggle: false,
 			computeValues: false,
 			info: null,
 			selectedStates: null
@@ -96,16 +98,30 @@ export default{
 	},
 
 	watch: {
+		rangeToggle: function (val) {
+			if (val)
+				this.dateList = this.getLastMonth();
+			else
+				this.dateList = this.getLastFifteenDays();		
+		},
+
 		computeValues: function () {
 			if (this.computeValues){
 				this.activeData = []; 
 				this.confirmedData = []; 
 				this.recoveredData = []; 
 				this.deceasedData = [];
+				this.dateList = this.getLastFifteenDays();
 				this.getDates.forEach(date=>{
-					let confirmedDeltas = this.info.filter(entry=> {return entry.status === "Confirmed" && entry.date === date});
-					let recoveredDeltas = this.info.filter(entry=> {return entry.status === "Recovered" && entry.date === date});
-					let deceasedDeltas 	= this.info.filter(entry=> {return entry.status === "Deceased" && entry.date === date});
+					let confirmedDeltas = this.info.filter(entry=> {
+						return entry.status === "Confirmed" && entry.date === date.format('DD-MMM-YY')
+					});
+					let recoveredDeltas = this.info.filter(entry=> {
+						return entry.status === "Recovered" && entry.date === date.format('DD-MMM-YY')
+					});
+					let deceasedDeltas 	= this.info.filter(entry=> {
+						return entry.status === "Deceased" && entry.date === date.format('DD-MMM-YY')
+					});
 					this.accumulateDeltas(confirmedDeltas[0], date, this.confirmedData);
 					this.accumulateDeltas(recoveredDeltas[0], date, this.recoveredData);
 					this.accumulateDeltas(deceasedDeltas[0], date, this.deceasedData);
@@ -127,8 +143,12 @@ export default{
 			return null;
 		},
 
-		last(data){
+		last(data) {
 			return data.splice(-1)[0];
+		},
+
+		first(data) {
+			return data[0];
 		},
 	},
 
@@ -154,8 +174,13 @@ export default{
 			});
 		},
 
-		mapAccumulated(data, state) {
-			return data.filter(record=>{return record['state'] === state}).map(x => { return x['accumulated']});
+		mapAccumulated(data, state, dateRange) {
+			data = data.filter(record=>{
+				return record['state'] === state && record['date'] >= dateRange[0] && record['date'] <= dateRange[1];
+			}).map(record => {
+				return record['accumulated'];
+			});
+			return data;
 		},
 
 		drawChart(state, dates, data, color) {
@@ -189,8 +214,49 @@ export default{
 				responsive: true,
 				maintainAspectRatio: false
 			}
+		},
+
+		getLastFifteenDays() {
+			this.dateRange = this.getRangeLastFifteenDays();
+			let dates = this.getDates.slice(Math.max(this.getDates.length - 15, 0));
+			return dates.map(value=> value.format('DD-MMM-YY'));
+		},
+
+		getLastMonth() {
+			this.dateRange = this.getRangeLastMonth();
+			let dates = this.getDates.slice(Math.max(this.getDates.length - 30, 0));
+			return dates.map(value=> value.format('DD-MMM-YY'));
+		},
+
+		getRangeLastFifteenDays() {
+			let data = this.getDates.slice(Math.max(this.getDates.length - 15, 0));
+			return [data[0], data.slice(-1)[0]];
+		},
+
+		getRangeLastMonth() {
+			let data = this.getDates.slice(Math.max(this.getDates.length - 30, 0));
+			return [data[0], data.slice(-1)[0]];
+		},
+
+		rNought(state) {
+			let numerator = this.activeData.filter(record=> {
+				return record['state'] === state && record['date'] === this.dateRange[1];
+			}).map(record => {
+				return record['accumulated'];
+			});
+			let denominator = this.activeData.filter(record=> {
+				return record['state'] === state && record['date'] === this.dateRange[0];
+			}).map(record => {
+				return record['accumulated'];
+			});
+			console.log(numerator);
+			console.log(denominator);
+			console.log(numerator/denominator);
+			console.log(parseFloat(numerator/denominator));
+			return parseFloat(numerator/denominator);
 		}
 	},
+
 
 	computed: {
 		getDates () {
@@ -199,7 +265,8 @@ export default{
 				this.info.forEach(value=>{
 					dates.add(value.date);
 				});
-				return Array.from(dates);
+				let data =  Array.from(dates);
+				return data.map(value=> {return moment(value)});
 			}
 			return null;
 		},

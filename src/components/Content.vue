@@ -1,29 +1,42 @@
 <template>
-	<div id="Content">
-		<div class="selector" v-if="states">
-			{{ getStates }}
-			Select State: <v-select :options="getStates"></v-select>
-			
-		</div>
+	<div id="Content" class="m-10 p-6">
 		<div class="p-10" v-if="activeData">
-			<div class="flex">
-				<div class="w-1/2">
-					<LineChart
-						:chartData="drawChart(state.state, getDates, mapAccumulated(confirmedData, state.state), '#0000ff')" 
-						:options="chartOptions()"
-					/>
-					<LineChart
-						:chartData="drawChart(state.state, getDates, mapAccumulated(activeData, state.state), '#ff0000')" 
-						:options="chartOptions()"
-					/>
-					<LineChart
-						:chartData="drawChart(state.state, getDates, mapAccumulated(recoveredData, state.state), '#00ff00')" 
-						:options="chartOptions()"
-					/>
-				</div>
-				<div class="w-1/2 bg-green-100">
-					Current R-Nought:
-					/// TODO: Calculate R Nought
+			<div class="selector" v-if="states">
+				Select State: 
+				<v-select multiple :options="getStates" v-model="selectedStates"></v-select>
+			</div>
+			<div v-if="selectedStates">
+				<div class="p-2" v-for="selectedState in selectedStates" :key="selectedState">
+					<h3 class="h-12 w-full text-center text-2xl">{{ selectedState }}</h3>
+					<div class="flex">
+						<div class="w-2/3 p-6">
+							<h4>Confirmed Cases</h4>
+							<LineChart class="p-6"
+								:chartData="drawChart(selectedState, getDates, mapAccumulated(confirmedData, selectedState), '#0000ff')" 
+								:options="chartOptions()"
+								:height="200"
+								:width="auto"
+							/>
+							<h4>Active Cases</h4>
+							<LineChart
+								:chartData="drawChart(selectedState, getDates, mapAccumulated(activeData, selectedState), '#ff0000')" 
+								:options="chartOptions()"
+								:height="200"
+								:width="auto"
+							/>
+							<h4>Recovered Cases</h4>
+							<LineChart
+								:chartData="drawChart(selectedState, getDates, mapAccumulated(recoveredData, selectedState), '#00ff00')" 
+								:options="chartOptions()"
+								:height="200"
+								:width="auto"
+							/>
+						</div>
+						<div class="w-1/3 bg-green-100 p-10">
+							Current R-Nought:
+							/// TODO: Calculate R Nought
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -55,7 +68,7 @@ export default{
 			deceasedData: null,
 			computeValues: false,
 			info: null,
-			checkToggle: false
+			selectedStates: null
 		}
 	},
 
@@ -192,7 +205,8 @@ export default{
 		},
 
 		getStates() {
-			return this.states.map(x => x['state']).sort();
+			let states = this.states.map(x => x['state']);
+			return states.sort();
 		}
 	},
 };

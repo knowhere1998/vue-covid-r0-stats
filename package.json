@@ -14,7 +14,8 @@
     "moment": "^2.26.0",
     "tailwindcss": "^1.4.6",
     "vue": "^2.6.11",
-    "vue-chartjs": "^3.5.0"
+    "vue-chartjs": "^3.5.0",
+    "vue-select": "^3.10.3"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.4.0",

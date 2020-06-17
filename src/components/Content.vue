@@ -249,10 +249,6 @@ export default{
 			}).map(record => {
 				return record['accumulated'];
 			});
-			console.log(numerator);
-			console.log(denominator);
-			console.log(numerator/denominator);
-			console.log(parseFloat(numerator/denominator));
 			return parseFloat(numerator/denominator);
 		}
 	},

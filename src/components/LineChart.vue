@@ -1,14 +1,45 @@
+<template>
+	<apexchart height=250 :options="options" :series="series"></apexchart>
+</template>
+
 <script>
-import { Line, mixins } from 'vue-chartjs'
-const { reactiveProp } = mixins
 
 export default{
-	extends: Line,
-	mixins: [reactiveProp],
-	props: ['chartData', 'options'],
-	mounted() {
-		this.renderChart(this.chartData, this.options);
+	props: ['chartName', 'dateList', 'data', 'color'],
+
+	data() {
+		return {
+
+		}
 	},
+	
+	mounted() {
+
+	},
+	computed: {
+		options () {
+			return {
+				colors:[this.color],
+				chart: {
+					id: this.chartName,
+					type: 'line'
+				},
+				xaxis: {
+					categories: this.dateList
+				},
+				stroke: {
+					curve: 'smooth',
+				}
+			};
+		},
+
+		series () {
+			return [{
+				name: this.ChartName,
+				data: this.data
+			}];
+		}
+	}
 }
 </script>
 

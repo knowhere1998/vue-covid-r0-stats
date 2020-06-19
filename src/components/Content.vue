@@ -1,42 +1,43 @@
 <template>
-	<div id="Content" class="m-10 p-6">
-		<div class="p-10" v-if="activeData">
-			<div class="selector" v-if="states">
-				Select State: 
-				<v-select multiple :options="getStates" v-model="selectedStates"></v-select>
-			</div>
-			<div class="filters flex content-between">
-				<div class="rangeToggle">
-					<span>2 weeks</span>
-					<label class="switch">
-						<input type="checkbox" v-model="rangeToggle">
-						<span class="slider round"></span>
-					</label>
-					<span>Last Month</span>
+	<div id="Content" class="m-10 bg-white p-6">
+		<div class="p-4" v-if="activeData">
+			<div v-if="states">
+				<div class="text-lg inline">
+					Select State: 
 				</div>
-				<div class="dataToggle">
-					<label class="switch">
-						<input type="checkbox" v-model="dataToggle">
-						<span class="slider round"></span>
-					</label>
-					<span>Cummulative</span>
+				<div class="inline">
+					<v-select multiple :options="getStates" v-model="selectedStates"></v-select>
 				</div>
-			</div>
-			<div v-if="selectedStates">
-				<div class="p-2" v-for="selectedState in selectedStates" :key="selectedState">
-					<StateInfo 
-						:state="selectedState" 
-						:dateList="dateList" 
-						:confirmedData="confirmedData" 
-						:activeData="activeData" 
-						:recoveredData="recoveredData"
-						:dateRange="dateRange"
-						:dataToggle="dataToggle"
-					/>
+				<div v-if="selectedStates">
+					<div class="filters flex p-4 content-between">
+						<div class="rangeToggle">
+							<span>2 weeks</span>
+							<toggle-button class="p-1" v-model="rangeToggle" color="#38b2ac"/>
+							<span>Last Month</span>
+						</div>
+						<div class="dataToggle pl-10">
+							<toggle-button class="p-1" v-model="dataToggle" color="#38b2ac"/>
+							<span>Cummulative</span>
+						</div>
+					</div>
+					
+					<div class="p-2" v-for="selectedState in selectedStates" :key="selectedState">
+						<StateInfo 
+							:state="selectedState" 
+							:dateList="dateList" 
+							:confirmedData="confirmedData" 
+							:activeData="activeData" 
+							:recoveredData="recoveredData"
+							:dateRange="dateRange"
+							:dataToggle="dataToggle"
+							:rangeToggle="rangeToggle"
+						/>
+					</div>
 				</div>
 			</div>
 		</div>
-		<div class="p-10" v-else>
+
+		<div class="p-10 text-2xl text-center font-bold" v-else>
 			No Records!
 		</div>
 	</div>
@@ -58,70 +59,66 @@ export default{
 			confirmedData: null,
 			recoveredData: null,
 			deceasedData: null,
-			dateList: null,
-			dateRange: null,
-			dataToggle: false,
+			dataToggle: true,
+			dateList: false,
+			dateRange: false,
 			rangeToggle: false,
 			computeValues: false,
-			info: null,
 			selectedStates: null
 		}
 	},
 
-	async mounted(){
-		await axios
-			.get('https://api.covid19india.org/v2/state_district_wise.json')
-			.then(response => {
-				this.states = [];
-				response.data.forEach(state=>{
-					delete state.districtData;
-					state.statecode = state.statecode.toLowerCase();
-					this.states.push(state);
-				});
-			},
-			(error) => { console.log(error) }
-		);
-		await axios
-			.get('https://api.covid19india.org/states_daily.json')
-			.then(response => {
-				this.info = response.data.states_daily; 
-				this.computeValues=true;
-			},
-			(error) => { console.log(error) }
-		);
+	mounted(){
+		let getData = new Promise((resolve, reject) => {
+			axios.get(
+					'https://5866055f356c.ngrok.io/json', {
+						headers: {
+							"Access-Control-Allow-Origin": "*",
+							"Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS",
+							"Access-Control-Allow-Headers": "Origin, Content-Type, X-Auth-Token"
+						}
+					}
+			).then(response => {
+					this.dates = response.data.dates;
+					this.states = response.data.states;
+					this.activeData = response.data.activeData;
+					this.confirmedData = response.data.confirmedData;
+					this.recoveredData = response.data.recoveredData;
+					this.deceasedData = response.data.deceasedData;
+					resolve('Success!');
+				},
+				(error) => { 
+					console.log(error);
+					reject('Error!');
+				}
+			);
+		});
+		getData.then(value=>{
+			console.log(value);
+			let dates = [];
+			if (this.rangeToggle){
+				dates = this.dates.slice(Math.max(this.dates.length - 30, 0));
+			}else {
+				dates = this.dates.slice(Math.max(this.dates.length - 15, 0));
+			}
+			this.dateRange 	= [dates[0], dates.slice(-1)[0]];
+			this.dateList 	= dates.map(value=> {return moment(value).format('DD-MMM-YY')});
+		}, error=>{
+			console.log(error);
+		});
+	
 	},
 
 	watch: {
 		rangeToggle: function (val) {
-			if (val)
-				this.dateList = this.getLastMonth();
-			else
-				this.dateList = this.getLastFifteenDays();		
-		},
-
-		computeValues: function () {
-			if (this.computeValues){
-				this.activeData = []; 
-				this.confirmedData = []; 
-				this.recoveredData = []; 
-				this.deceasedData = [];
-				this.dateList = this.getLastFifteenDays();
-				this.getDates.forEach(date=>{
-					let confirmedDeltas = this.info.filter(entry=> {
-						return entry.status === "Confirmed" && entry.date === date.format('DD-MMM-YY')
-					});
-					let recoveredDeltas = this.info.filter(entry=> {
-						return entry.status === "Recovered" && entry.date === date.format('DD-MMM-YY')
-					});
-					let deceasedDeltas 	= this.info.filter(entry=> {
-						return entry.status === "Deceased" && entry.date === date.format('DD-MMM-YY')
-					});
-					this.accumulateDeltas(confirmedDeltas[0], date, this.confirmedData);
-					this.accumulateDeltas(recoveredDeltas[0], date, this.recoveredData);
-					this.accumulateDeltas(deceasedDeltas[0], date, this.deceasedData);
-					this.accumulateActiveDeltas(date);
-				});
+			let dates = [];
+			if (val){
+				dates = this.dates.slice(Math.max(this.dates.length - 30, 0));
+			}else {
+				dates = this.dates.slice(Math.max(this.dates.length - 15, 0));
 			}
+			this.dateRange 	= [dates[0], dates.slice(-1)[0]];
+			this.dateList 	= dates.map(value=> {return moment(value).format('DD-MMM-YY')});
 		},
 	},
 
@@ -140,68 +137,16 @@ export default{
 	},
 
 	methods: {
-		accumulateDeltas(data, date, arr) {
-			this.states.forEach(state=>{
-				let delta = Number(data[state.statecode])
-				let filteredArr = arr.filter(entry=>{return entry.state === state.state});
-				let prev = Number((filteredArr.length > 0) ? filteredArr.slice(-1)[0]['accumulated']: 0);
-				let total = delta + prev
-				arr.push({"state": state.state, "date": date, "delta": delta, "accumulated": total});
-			});
-		},
-
-		accumulateActiveDeltas(date, arr = this.activeData) {
-				this.states.forEach(state=>{
-				let confirmedEntry 	= this.confirmedData.filter(entry=> {return entry.state === state.state && entry.date === date})[0];
-				let recoveredEntry 	= this.recoveredData.filter(entry=> {return entry.state === state.state && entry.date === date})[0];
-				let deceasedEntry 	= this.deceasedData.filter(entry=> {return entry.state === state.state && entry.date === date})[0];
-				let delta = Number(confirmedEntry.delta) - Number(recoveredEntry.delta) - Number(deceasedEntry.delta);
-				let total = Number(confirmedEntry.accumulated) - Number(recoveredEntry.accumulated) - Number(deceasedEntry.accumulated);
-				arr.push({"state": state.state, "date": date, "delta": delta, "accumulated": total});
-			});
-		},
-
-		getLastFifteenDays() {
-			this.dateRange = this.getRangeLastFifteenDays();
-			let dates = this.getDates.slice(Math.max(this.getDates.length - 15, 0));
-			return dates.map(value=> value.format('DD-MMM-YY'));
-		},
-
-		getLastMonth() {
-			this.dateRange = this.getRangeLastMonth();
-			let dates = this.getDates.slice(Math.max(this.getDates.length - 30, 0));
-			return dates.map(value=> value.format('DD-MMM-YY'));
-		},
-
-		getRangeLastFifteenDays() {
-			let data = this.getDates.slice(Math.max(this.getDates.length - 15, 0));
-			return [data[0], data.slice(-1)[0]];
-		},
-
-		getRangeLastMonth() {
-			let data = this.getDates.slice(Math.max(this.getDates.length - 30, 0));
-			return [data[0], data.slice(-1)[0]];
-		},
+		
 	},
 
 
 	computed: {
-		getDates () {
-			if(this.computeValues) {
-				let dates = new Set();
-				this.info.forEach(value=>{
-					dates.add(value.date);
-				});
-				let data =  Array.from(dates);
-				return data.map(value=> {return moment(value)});
-			}
-			return null;
-		},
-
 		getStates() {
 			let states = this.states.map(x => x['state']);
 			return states.sort();
-		}
+		},
+
 	},
 };
 </script>

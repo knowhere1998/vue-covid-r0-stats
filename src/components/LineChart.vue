@@ -1,5 +1,5 @@
 <template>
-	<apexchart height=250 :options="options" :series="series"></apexchart>
+	<apexchart height=200 :options="options" :series="series"></apexchart>
 </template>
 
 <script>
@@ -16,6 +16,7 @@ export default{
 	mounted() {
 
 	},
+
 	computed: {
 		options () {
 			return {
@@ -25,7 +26,7 @@ export default{
 					type: 'line'
 				},
 				xaxis: {
-					categories: this.dateList
+					categories: this.dateList,
 				},
 				stroke: {
 					curve: 'smooth',
@@ -35,7 +36,7 @@ export default{
 
 		series () {
 			return [{
-				name: this.ChartName,
+				name: this.chartName,
 				data: this.data
 			}];
 		}

@@ -71,7 +71,7 @@ export default{
 	mounted(){
 		let getData = new Promise((resolve, reject) => {
 			axios.get(
-					'https://5866055f356c.ngrok.io/json', {
+					'https://sheltered-stream-87921.herokuapp.com/json', {
 						headers: {
 							"Access-Control-Allow-Origin": "*",
 							"Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS",

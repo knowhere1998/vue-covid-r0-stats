@@ -6,7 +6,7 @@
 					<span class="font-semibold text-xl tracking-tight">R-Nought</span>
 				</a>
 			</div>
-			<div class="w-full block flex-grow lg:flex lg:items-center lg:w-auto">
+			<div class="w-full block flex-grow lg:flex lg:items-center w-auto">
 				<div class="text-sm lg:flex-grow">
 					<a href="https://github.com/knowhere1998/" class="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4">
 						Github

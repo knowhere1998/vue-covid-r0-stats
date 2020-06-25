@@ -1,7 +1,11 @@
 <template>
-	<div id="Content" class="m-10 bg-white p-6">
-		<div class="p-4" v-if="activeData">
+	<div id="Content" class="lg:m-10 lg:p-6 lg:flex justify-around">
+		<div class="lg:p-4 lg:w-3/4"  v-if="activeData">
 			<div v-if="states">
+				<div class="p-10">	
+					<CandleStickChart height=500 showLabels=true chartName="Rt-stateWise"  type= "candlestick" :dateList="getStates" color="#ff0000" :data="getRtData(activeData)" />
+				</div>
+
 				<div class="text-lg inline">
 					Select State: 
 				</div>
@@ -11,7 +15,7 @@
 				<div v-if="selectedStates">
 					<div class="filters flex p-4 content-between">
 						<div class="rangeToggle">
-							<span>2 weeks</span>
+							<span>bi-weekly</span>
 							<toggle-button class="p-1" v-model="rangeToggle" color="#38b2ac"/>
 							<span>Last Month</span>
 						</div>
@@ -23,7 +27,7 @@
 					
 					<div class="p-2" v-for="selectedState in selectedStates" :key="selectedState">
 						<StateInfo 
-							:state="selectedState" 
+							:state="selectedState"
 							:dateList="dateList" 
 							:confirmedData="confirmedData" 
 							:activeData="activeData" 
@@ -31,26 +35,39 @@
 							:dateRange="dateRange"
 							:dataToggle="dataToggle"
 							:rangeToggle="rangeToggle"
+							:dates="dates"
 						/>
 					</div>
 				</div>
 			</div>
 		</div>
-
-		<div class="p-10 text-2xl text-center font-bold" v-else>
-			No Records!
+		<div class="p-10 text-center font-bold" v-else>
+			<div class="p-10 text-2xl">
+				Please wait while we crunch the data!
+			</div>
+			<pulse-loader :loading="! activeData" size="20px"></pulse-loader>
+		</div>
+		<div class="lg:w-1/4">
+			<Sidebar />
 		</div>
 	</div>
 </template>
 
 <script>
+import Sidebar from './Sidebar.vue'
+
 import axios from 'axios';
 import moment from 'moment';
 import StateInfo from './StateInfo.vue';
+import CandleStickChart from './CandleStickChart.vue';
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 
 export default{
 	components:{
+		Sidebar,
 		StateInfo,
+		PulseLoader,
+		CandleStickChart
 	},
 	data() {
 		return {
@@ -64,7 +81,7 @@ export default{
 			dateRange: false,
 			rangeToggle: false,
 			computeValues: false,
-			selectedStates: null
+			selectedStates: []
 		}
 	},
 
@@ -86,6 +103,7 @@ export default{
 					this.recoveredData = response.data.recoveredData;
 					this.deceasedData = response.data.deceasedData;
 					resolve('Success!');
+					this.selectedStates.push(this.states.filter(record => {return record.statecode == "mh";})[0]['state']);
 				},
 				(error) => { 
 					console.log(error);
@@ -137,7 +155,18 @@ export default{
 	},
 
 	methods: {
-		
+		getRtData(data) {
+			let lastValues = [];
+			this.getStates.forEach(state=>{
+				let lastValue = data.filter(record=>{
+					return record['state'] === state;
+				});
+				lastValue = lastValue.slice(Math.max(lastValue.length - 4, 0)).map(record=> { return (record['rt']) ? record['rt'].toFixed(2): 0 });
+				lastValues.push({'x': state, 'y': lastValue});
+			});
+			return lastValues;
+		},
+	
 	},
 
 

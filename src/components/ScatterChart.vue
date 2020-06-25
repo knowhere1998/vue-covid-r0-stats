@@ -53,7 +53,7 @@ export default{
 					options: {
 						plotOptions: {
 							bar: {
-								horizontal: false
+								horizontal: true
 							}
 						},
 						legend: {

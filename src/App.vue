@@ -1,11 +1,15 @@
 <template>
 	<div id="app">
 		<Nav />
-		<Content class="flex-grow" />
+		<div class="lg:flex">
+			<Content class="lg:w-3/4" />
+			<Sidebar class="lg:w-1/4" />
+		</div>
 	</div>
 </template>
 
 <script>
+import Sidebar from './components/Sidebar.vue'
 import Nav from './components/Nav.vue'
 import Content from './components/Content.vue'
 
@@ -14,6 +18,7 @@ export default {
 	components: {
 		Nav,
 		Content,
+		Sidebar,
 	}
 };
 </script>

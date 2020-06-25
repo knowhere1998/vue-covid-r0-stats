@@ -1,8 +1,8 @@
 <template>
 	<div class="state-info border-4 rounded-lg lg:p-4 sm:p-2 border-gray-200 shadow-lg justify-center">
 		<div class="lg:flex justify-around">
-			<h3 class="h-14 w-1/3 md:text-xl px-5 pt-4 md:font-extrabold lg:text-5xl">{{ state }}</h3>
-			<div class="lg:flex w-2/3 justify-end">
+			<h3 class="w-1/3 md:text-xl px-5 pt-4 md:font-extrabold lg:text-5xl align-middle">{{ state }}</h3>
+			<div class="lg:flex w-2/3 align-middle justify-end">
 				<div class="inline-block px-4 pt-5">
 					<div class="flow-root lg:text-xl sm:text-sm lg:text-center lg:font-bold text-red-800">
 						Confirmed: {{ confirmedData | state(state) | last | accumulated }} ({{ confirmedData | state(state) | last | delta | getNumber }})
@@ -31,11 +31,11 @@
 			</div>
 			<div class="lg:w-1/2 lg:p-6 md:p-4 m-2 lg:mr-5 rounded-r-lg overflow-hidden shadow-inner justify-center">
 				<div class="container h-full items-end">
-					<div class="lg:text-4xl lg:text-center p-10">
-						<div class="font-extrabold flow-root lg:text-center">
+					<div class="lg:text-4xl font-extrabold lg:text-center p-10">
+						<div class="flow-root">
 							Current R<sub>t</sub>
 						</div>
-						<div class="font-extrabold flow-root lg:text-center">
+						<div class="flow-root">
 							{{ rNought(state) | toFixed(3) }}
 						</div>
 						<div class="text-sm">(for last 15 days)</div>

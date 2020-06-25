@@ -6,7 +6,7 @@ import vSelect from 'vue-select';
 import VueApexCharts from 'vue-apexcharts';
 import AxiosPlugin from 'vue-axios-cors';
 import moment from 'moment';
-import { ToggleButton } from 'vue-js-toggle-button'
+import { ToggleButton } from 'vue-js-toggle-button';
 
 Vue.component('pulse-loader', require('vue-spinner/src/PulseLoader.vue'));
 Vue.component('ToggleButton', ToggleButton)

@@ -3,7 +3,7 @@
 		<div class="lg:p-4 lg:w-3/4"  v-if="activeData">
 			<div v-if="states">
 				<div class="p-10">	
-					<CandleStickChart height=500 showLabels=true chartName="Rt-stateWise"  type= "candlestick" :dateList="getStates" color="#ff0000" :data="getRtData(activeData)" />
+					<ScatterChart height=500 showLabels=true :chartName="getChartName()"  type= "scatter" :categories="getStates" :data="getRtData(activeData)" />
 				</div>
 
 				<div class="text-lg inline">
@@ -59,7 +59,7 @@ import Sidebar from './Sidebar.vue'
 import axios from 'axios';
 import moment from 'moment';
 import StateInfo from './StateInfo.vue';
-import CandleStickChart from './CandleStickChart.vue';
+import ScatterChart from './ScatterChart.vue';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 
 export default{
@@ -67,7 +67,7 @@ export default{
 		Sidebar,
 		StateInfo,
 		PulseLoader,
-		CandleStickChart
+		ScatterChart
 	},
 	data() {
 		return {
@@ -155,20 +155,22 @@ export default{
 	},
 
 	methods: {
+		getChartName() {
+			return "Rt-latest";
+		},
+
 		getRtData(data) {
 			let lastValues = [];
 			this.getStates.forEach(state=>{
 				let lastValue = data.filter(record=>{
 					return record['state'] === state;
-				});
-				lastValue = lastValue.slice(Math.max(lastValue.length - 4, 0)).map(record=> { return (record['rt']) ? record['rt'].toFixed(2): 0 });
-				lastValues.push({'x': state, 'y': lastValue});
+				}).splice(-1)[0];
+				lastValue = (lastValue['rt']) ? lastValue['rt'].toFixed(2): 0;
+				lastValues.push(lastValue);
 			});
 			return lastValues;
 		},
-	
 	},
-
 
 	computed: {
 		getStates() {

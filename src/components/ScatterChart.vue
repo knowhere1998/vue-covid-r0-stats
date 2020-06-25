@@ -5,12 +5,11 @@
 <script>
 
 export default{
-	props: ['chartName', 'dateList', 'data', 'color', 'type', 'height', 'showLabels'],
+	props: ['chartName', 'categories', 'data', 'type', 'height', 'showLabels'],
 
 	computed: {
 		options () {
 			return {
-				colors:[this.color],
 				chart: {
 					id: this.chartName,
 					type: this.type
@@ -19,7 +18,7 @@ export default{
 					text: this.chartName,
 				},
 				xaxis: {
-					categories: this.dateList,
+					categories: this.categories,
 					labels: {
 						show: this.showLabels
 					},
@@ -45,7 +44,7 @@ export default{
 							},
 							orientation: 'horizontal',
 							offsetX: 0,
-							text: 'Annotation Test'
+							// text: 'Annotation Test'
 						}
 					}]
 				},
@@ -67,6 +66,7 @@ export default{
 
 		series () {
 			return [{
+				name: this.chartName,
 				data: this.data,
 			}];
 		}

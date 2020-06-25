@@ -2,28 +2,27 @@
 	<div id="app">
 		<Nav />
 		<Content class="flex-grow" />
-		<Footer />
 	</div>
 </template>
 
 <script>
 import Nav from './components/Nav.vue'
 import Content from './components/Content.vue'
-import Footer from './components/Footer.vue'
 
 export default {
 	name: 'App',
 	components: {
 		Nav,
 		Content,
-		Footer
 	}
 };
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400&display=swap');
+
 #app {
-	font-family: Avenir, Helvetica, Arial, sans-serif;
+	font-family: 'Fira Sans', sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	display: flex;

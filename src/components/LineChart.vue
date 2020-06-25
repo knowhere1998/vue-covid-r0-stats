@@ -1,21 +1,11 @@
 <template>
-	<apexchart height=200 :options="options" :series="series"></apexchart>
+	<apexchart :height="height" :options="options" :series="series"></apexchart>
 </template>
 
 <script>
 
 export default{
-	props: ['chartName', 'dateList', 'data', 'color'],
-
-	data() {
-		return {
-
-		}
-	},
-	
-	mounted() {
-
-	},
+	props: ['chartName', 'dateList', 'data', 'color', 'type', 'height', 'showLabels'],
 
 	computed: {
 		options () {
@@ -23,11 +13,27 @@ export default{
 				colors:[this.color],
 				chart: {
 					id: this.chartName,
-					type: 'line'
+					type: this.type
 				},
 				xaxis: {
 					categories: this.dateList,
+					labels: {
+						show: this.showLabels
+					}
 				},
+				responsive: [{
+					breakpoint: 1000,
+					options: {
+						plotOptions: {
+							bar: {
+								horizontal: false
+							}
+						},
+						legend: {
+							position: "bottom"
+						}
+					},
+				}],
 				stroke: {
 					curve: 'smooth',
 				}

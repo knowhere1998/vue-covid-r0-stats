@@ -1,62 +1,48 @@
 <template>
-	<div class="state-info border-4 rounded-lg p-4 border-gray-200 shadow-lg justify-center">
-		<h3 class="h-14 w-full text-center text-5xl">{{ state }}</h3>
-		<div class="flex">
-			<div class="w-1/2 p-6 m-2 ml-5 rounded-l-lg overflow-hidden border-2 border-gray-400 shadow-inner justify-center bg-gray-200">
-				<div class="flow-root text-center font-bold text-red-800">Confirmed Cases</div>
-					<LineChart chartName="Confirmed Cases" :dateList="dateList" color="#ff0000" :data="getMapData(confirmedData)" />
-				<div class="flow-root text-center font-bold text-blue-800">Active Cases</div>
-					<LineChart chartName="Active Cases" :dateList="dateList" color="#0000ff" :data="getMapData(activeData)" />
-				<div class="flow-root text-center font-bold text-green-800">Recovered Cases</div>
-					<LineChart chartName="Recovered Cases" :dateList="dateList" color="#00ff00" :data="getMapData(recoveredData)" />
+	<div class="state-info border-4 rounded-lg lg:p-4 sm:p-2 border-gray-200 shadow-lg justify-center">
+		<div class="lg:flex justify-around">
+			<h3 class="h-14 w-1/3 md:text-xl px-5 pt-4 md:font-extrabold lg:text-5xl">{{ state }}</h3>
+			<div class="lg:flex w-2/3 justify-end">
+				<div class="inline-block px-4 pt-5">
+					<div class="flow-root lg:text-xl sm:text-sm lg:text-center lg:font-bold text-red-800">
+						Confirmed: {{ confirmedData | state(state) | last | accumulated }} ({{ confirmedData | state(state) | last | delta | getNumber }})
+					</div>
+				</div>
+				<div class="inline-block px-4 pt-5">
+					<div class="flow-root lg:text-xl sm:text-sm lg:text-center lg:font-bold text-blue-800">
+						Active: {{ activeData | state(state) | last | accumulated }} ({{ activeData | state(state) | last | delta | getNumber }})
+					</div>
+				</div>
+				<div class="inline-block px-4 pt-5">
+					<div class="flow-root lg:text-xl sm:text-sm lg:text-center lg:font-bold text-green-800">
+						Recovered: {{ recoveredData | state(state) | last | accumulated }} ({{ recoveredData | state(state) | last | delta | getNumber }})
+					</div>
+				</div>
 			</div>
-			<div class="w-1/2 p-6 m-2 mr-5 rounded-r-lg overflow-hidden border-2 border-gray-400 shadow-inner justify-center bg-gray-200">
+		</div>
+		<div class="lg:flex">
+			<div class="lg:w-1/2 lg:p-6 md:p-4 m-2 lg:ml-5 rounded-l-lg overflow-hidden shadow-inner justify-center">
+				<div class="flow-root lg:text-center lg:font-bold text-red-800">Confirmed Cases</div>
+					<LineChart height=200 showLabels=true chartName="Confirmed Cases" :type= "getType()" :dateList="dateList" color="#ff0000" :data="getMapData(confirmedData)" />
+				<div class="flow-root lg:text-center lg:font-bold text-blue-800">Active Cases</div>
+					<LineChart height=200 showLabels=true chartName="Active Cases" :type= "getType()" :dateList="dateList" color="#0000ff" :data="getMapData(activeData)" />
+				<div class="flow-root lg:text-center lg:font-bold text-green-800">Recovered Cases</div>
+					<LineChart height=200 showLabels=true chartName="Recovered Cases" :type= "getType()" :dateList="dateList" color="#00ff00" :data="getMapData(recoveredData)" />
+			</div>
+			<div class="lg:w-1/2 lg:p-6 md:p-4 m-2 lg:mr-5 rounded-r-lg overflow-hidden shadow-inner justify-center">
 				<div class="container h-full items-end">
-					<div class="text-4xl text-center p-10">
-						<div class="font-extrabold flow-root text-center">
-							Current R<sub>0</sub>
+					<div class="lg:text-4xl lg:text-center p-10">
+						<div class="font-extrabold flow-root lg:text-center">
+							Current R<sub>t</sub>
 						</div>
-						<div class="font-extrabold flow-root text-center">
+						<div class="font-extrabold flow-root lg:text-center">
 							{{ rNought(state) | toFixed(3) }}
 						</div>
 						<div class="text-sm">(for last 15 days)</div>
 					</div>
-					<div class="px-6 inline-block">
-						<div class="flow-root pt-2 text-2xl text-center font-bold text-red-800">
-							Confirmed
-						</div>
-						<div class="flow-root text-2xl text-center font-bold text-red-800">
-							Total: {{ confirmedData | state(state) | last | accumulated }}
-						</div>
-						<div class="flow-root text-xl text-center font-bold text-red-800">
-							Latest delta: {{ confirmedData | state(state) | last | delta }}
-						</div>
-					</div>
-					<div class="px-6 inline-block">
-						<div class="flow-root pt-2 text-2xl text-center font-bold text-blue-800">
-							Active
-						</div>
-						<div class="flow-root text-2xl text-center font-bold text-blue-800">
-							Total: {{ activeData    | state(state) | last | accumulated }}
-						</div>
-						<div class="flow-root text-xl text-center font-bold text-blue-800">
-							Latest delta: {{ activeData    | state(state) | last | delta }}
-						</div>
-					</div>
-					<div class="px-6 inline-block">
-						<div class="flow-root pt-2 text-2xl text-center font-bold text-green-800">
-							Recovered
-						</div>
-						<div class="flow-root text-2xl text-center font-bold text-green-800">
-							Total: {{ recoveredData | state(state) | last | accumulated }}
-						</div>
-						<div class="flow-root text-xl text-center font-bold text-green-800">
-							Latest delta: {{ recoveredData | state(state) | last | delta }}
-						</div>
-					</div>
-					<div class="px-4 py-10">
-						<div class="p-2 flow-root text-2xl text-center font-bold text-blue-800">Rt-Trend</div>
-						<LineChart chartName="Rt-map" :dateList="dateList" color="#0000ff" :data="getRtData(activeData)" />
+					<div class="lg:px-4 sm:px-2 py-10">
+						<div class="flow-root lg:text-2xl lg:text-center lg:font-bold text-blue-800">Rt-Trend</div>
+						<LineChart height=400 chartName="Rt-map" :dateList="getDates" color="#0000ff" :data="getRtData(activeData)" />
 					</div>
 				</div>
 			</div>
@@ -75,9 +61,12 @@ export default  {
 		LineChart,
 	},
 	
-	props: ['state', 'dateList', 'confirmedData', 'activeData', 'recoveredData', 'dateRange', 'dataToggle', "rangeToggle"],
+	props: ['state', 'dates', 'dateList', 'confirmedData', 'activeData', 'recoveredData', 'dateRange', 'dataToggle', "rangeToggle"],
 
-	mounted () {
+	computed: {
+		getDates () {
+			return this.dates.map(value=> {return moment(value).format('DD-MMM-YY')});
+		},
 
 	},
 
@@ -103,9 +92,9 @@ export default  {
 
 		getRtData(data) {
 			data = data.filter(record=>{
-				return record['state'] === this.state && record['date'] >= this.dateRange[0] && record['date'] <= this.dateRange[1];
+				return record['state'] === this.state;
 			}).map(record => {
-				return record['rt'].toFixed(3);
+				return (record['rt']) ? record['rt'].toFixed(2): 0;
 			});
 			return data;
 		},
@@ -117,10 +106,14 @@ export default  {
 				return record['rt'];
 			}).slice(-1)[0];
 		},
-	},
 
-	computed: {
-
+		getType() {
+			if (this.dataToggle) {
+				return "line"
+			}else {
+				return "bar"
+			}
+		},
 	},
 
 	filters: {
@@ -144,7 +137,11 @@ export default  {
 		},
 
 		toFixed(value, limit){
-			return value.toFixed(limit);
+			if (value){
+				return value.toFixed(limit);
+			}else{
+				return 0;
+			}
 		},
 
 		accumulated(value) {
@@ -154,6 +151,14 @@ export default  {
 		delta(value) {
 			return value['delta']
 		},
+
+		getNumber(value) {
+			if (value > 0) {
+				return "+" + value;
+			} else {
+				return value.toString();
+			}
+		}
 	},
 };
 

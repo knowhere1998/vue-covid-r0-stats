@@ -11,12 +11,9 @@
 					class="absolute top-0 right-0 text-xl text-gray-500 my-2 mx-4 cursor-pointer"
 					@click.prevent="closeModal()"
 					tabindex="0"
-				>
-					× 
-				</a>
+				> × </a>
 				<div v-for="question in questions" :key="question.question">
 					<Question :question="question.question" :answer="question.answer" :active="question.active" />
-					<!-- {{ question.question }}= {{ question.answer }} -->
 				</div>
 			</div>
 		</div>

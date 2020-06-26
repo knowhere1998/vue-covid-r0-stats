@@ -13,7 +13,10 @@ export default{
 				colors:[this.color],
 				chart: {
 					id: this.chartName,
-					type: this.type
+					type: this.type,
+					toolbar: {
+						show: false
+					}
 				},
 				xaxis: {
 					categories: this.dateList,

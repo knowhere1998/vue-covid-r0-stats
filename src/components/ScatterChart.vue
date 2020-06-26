@@ -12,7 +12,10 @@ export default{
 			return {
 				chart: {
 					id: this.chartName,
-					type: this.type
+					type: this.type,
+					toolbar: {
+						show: false
+					}
 				},
 				title: {
 					text: this.chartName,

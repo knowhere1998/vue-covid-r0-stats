@@ -1,17 +1,18 @@
 <template>
-	<div id="app">
-		<Nav />
+	<div id="app" class="bg-gray-200">
+		<Nav :modalStatus.sync="faqModalShow" />
 		<div class="lg:flex">
 			<Content class="lg:w-3/4" />
-			<Sidebar class="lg:w-1/4" />
+			<Sidebar :modalStatus.sync="faqModalShow" class="lg:w-1/4" />
 		</div>
+        <faq-modal :showModal="faqModalShow" @closeModal="faqModalShow = false"></faq-modal>
 	</div>
 </template>
 
 <script>
 import Sidebar from './components/Sidebar.vue'
-import Nav from './components/Nav.vue'
 import Content from './components/Content.vue'
+import Nav from './components/Nav.vue'
 
 export default {
 	name: 'App',
@@ -19,6 +20,11 @@ export default {
 		Nav,
 		Content,
 		Sidebar,
+	},
+	data() {
+		return {
+			faqModalShow: false,
+		};
 	}
 };
 </script>

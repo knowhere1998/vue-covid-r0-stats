@@ -1,19 +1,19 @@
 <template>
-	<div class="state-info border-4 rounded-lg lg:p-4 sm:p-2 border-gray-200 shadow-lg justify-center">
+	<div class="state-info border-4 bg-white rounded-lg lg:px-4 sm:px-2 border-gray-200 shadow-lg justify-center">
 		<div class="lg:flex justify-around">
-			<h3 class="w-1/3 md:text-xl px-5 pt-4 md:font-extrabold lg:text-5xl align-middle">{{ state }}</h3>
+			<h3 class="w-1/3 md:text-xl p-4 pt-4 md:font-extrabold lg:text-5xl align-middle">{{ state }}</h3>
 			<div class="lg:flex w-2/3 align-middle justify-end">
-				<div class="inline-block px-4 pt-5">
+				<div class="inline-block px-4 pt-10">
 					<div class="flow-root lg:text-xl sm:text-sm lg:text-center lg:font-bold text-red-800">
 						Confirmed: {{ confirmedData | state(state) | last | accumulated }} ({{ confirmedData | state(state) | last | delta | getNumber }})
 					</div>
 				</div>
-				<div class="inline-block px-4 pt-5">
+				<div class="inline-block px-4 pt-10">
 					<div class="flow-root lg:text-xl sm:text-sm lg:text-center lg:font-bold text-blue-800">
 						Active: {{ activeData | state(state) | last | accumulated }} ({{ activeData | state(state) | last | delta | getNumber }})
 					</div>
 				</div>
-				<div class="inline-block px-4 pt-5">
+				<div class="inline-block px-4 pt-10">
 					<div class="flow-root lg:text-xl sm:text-sm lg:text-center lg:font-bold text-green-800">
 						Recovered: {{ recoveredData | state(state) | last | accumulated }} ({{ recoveredData | state(state) | last | delta | getNumber }})
 					</div>
@@ -21,7 +21,7 @@
 			</div>
 		</div>
 		<div class="lg:flex">
-			<div class="lg:w-1/2 lg:p-6 md:p-4 m-2 lg:ml-5 rounded-l-lg overflow-hidden shadow-inner justify-center">
+			<div class="lg:w-1/2 lg:pt-6 md:pt-4 mt-2 lg:ml-5 rounded-l-lg overflow-hidden shadow-inner justify-center">
 				<div class="flow-root lg:text-center lg:font-bold text-red-800">Confirmed Cases</div>
 					<LineChart height=200 showLabels=true chartName="Confirmed Cases" :type= "getType()" :dateList="dateList" color="#ff0000" :data="getMapData(confirmedData)" />
 				<div class="flow-root lg:text-center lg:font-bold text-blue-800">Active Cases</div>
@@ -29,18 +29,15 @@
 				<div class="flow-root lg:text-center lg:font-bold text-green-800">Recovered Cases</div>
 					<LineChart height=200 showLabels=true chartName="Recovered Cases" :type= "getType()" :dateList="dateList" color="#00ff00" :data="getMapData(recoveredData)" />
 			</div>
-			<div class="lg:w-1/2 lg:p-6 md:p-4 m-2 lg:mr-5 rounded-r-lg overflow-hidden shadow-inner justify-center">
+			<div class="lg:w-1/2 lg:pt-6 md:pt-4 mt-2 lg:mr-5 rounded-r-lg overflow-hidden shadow-inner justify-center">
 				<div class="container h-full items-end">
-					<div class="lg:text-4xl font-extrabold lg:text-center p-10">
-						<div class="flow-root">
-							Current R<sub>t</sub>
-						</div>
-						<div class="flow-root">
-							{{ rNought(state) | toFixed(3) }}
+					<div class="lg:text-4xl font-extrabold lg:text-center p-16">
+						<div class="pb-5">
+							Current R<sub>t</sub> &nbsp;&nbsp;&nbsp;&nbsp; {{ rNought(state) | toFixed(3) }}
 						</div>
 						<div class="text-sm">(for last 15 days)</div>
 					</div>
-					<div class="lg:px-4 sm:px-2 py-10">
+					<div class="sm:px-2">
 						<div class="flow-root lg:text-2xl lg:text-center lg:font-bold text-blue-800">Rt-Trend</div>
 						<LineChart height=400 chartName="Rt-map" :dateList="getDates" color="#0000ff" :data="getRtData(activeData)" />
 					</div>

@@ -3,82 +3,98 @@
 		<div class="lg:p-4"	v-if="activeData">
 			<div v-if="states">
 				<div class=" border bg-white shadow-lg">
-					<ul class="list-reset lg:flex px-5 py-3">
-						<li class="mr-3">
-							<a class="inline-block py-1 px-3 border rounded-lg"
-							@click="selected = 1"
-							:class="{
-								'border-blue bg-blue-500 text-white' : selected === 1, 
-								'border-white hover:border-grey-lighter text-blue-500 hover:bg-grey-lighter' : selected != 1
-							}"
-							href="#">Latest</a>
-						</li>
-						<li class="mr-3">
-							<a class="inline-block py-1 px-3 border rounded-lg"
-							@click="selected = 2"
-							:class="{
-								'border-blue bg-blue-500 text-white' : selected === 2, 
-								'border-white hover:border-grey-lighter text-blue-500 hover:bg-grey-lighter' : selected != 2
-							}"
-							href="#">Last Week</a>
-						</li>
-						<li class="mr-3">
-							<a class="inline-block py-1 px-3 border rounded-lg"
-							@click="selected = 3"
-							:class="{
-								'border-blue bg-blue-500 text-white' : selected === 3, 
-								'border-white hover:border-grey-lighter text-blue-500 hover:bg-grey-lighter' : selected != 3
-							}"
-							href="#">1 month ago</a>
-						</li>
-					</ul>
+					<div class="lg:flex">
+						<ul class="list-reset w-1/3 lg:flex align-middle px-5 py-3">
+							<li class="mr-3">
+								<a class="cursor-pointer inline-block py-1 px-3 border rounded-lg"
+								@click="selector = 1"
+								:class="{
+									'border-blue bg-blue-500 text-white' : selector === 1, 
+									'border-white hover:border-grey-lighter text-blue-500 hover:bg-grey-lighter' : selector != 1
+								}" >Latest</a>
+							</li>
+							<li class="mr-3">
+								<a class="cursor-pointer inline-block py-1 px-3 border rounded-lg"
+								@click="selector = 2"
+								:class="{
+									'border-blue bg-blue-500 text-white' : selector === 2, 
+									'border-white hover:border-grey-lighter text-blue-500 hover:bg-grey-lighter' : selector != 2
+								}" >Last Week</a>
+							</li>
+							<li class="mr-3">
+								<a class="cursor-pointer inline-block py-1 px-3 border rounded-lg"
+								@click="selector = 3"
+								:class="{
+									'border-blue bg-blue-500 text-white' : selector === 3, 
+									'border-white hover:border-grey-lighter text-blue-500 hover:bg-grey-lighter' : selector != 3
+								}" >1 month ago</a>
+							</li>
+						</ul>
+						<div class="w-2/3 lg:flex align-middle justify-end">
+							<div class="inline-block px-4 lg:py-5 py-4">
+								<div class="flow-root lg:text-xl sm:text-sm lg:text-center lg:font-bold text-red-800">
+									Confirmed: {{ countryWideConfirmedTotal }} ({{ countryWideConfirmedDelta | getNumber }})
+								</div>
+							</div>
+							<div class="inline-block px-4 lg:py-5 py-4">
+								<div class="flow-root lg:text-xl sm:text-sm lg:text-center lg:font-bold text-blue-800">
+									Active: {{ countryWideActiveTotal }} ({{ countryWideActiveDelta | getNumber }})
+								</div>
+							</div>
+							<div class="inline-block px-4 lg:py-5 py-4">
+								<div class="flow-root lg:text-xl sm:text-sm lg:text-center lg:font-bold text-green-800">
+									Recovered: {{ countryWideRecoveredTotal }} ({{ countryWideRecoveredDelta | getNumber }})
+								</div>
+							</div>
+						</div>
+					</div>
 					<div class="lg:p-5">
-						<ScatterChart height=400 showLabels=true :chartName="getChartName()" type= "scatter" :categories="getStates" :data="getRtData(activeData)" />
+						<ScatterChart height=400 showLabels=true :chartName="chartDate" type= "scatter" :categories="getStates" :data="getRtData(activeData)" :annotationValue="countryWideRt" />
 					</div>
 				</div>
 				<div class="p-4 mt-5 bg-white border shadow-lg">
-					<div class="text-lg inline">
-						Select State: 
-					</div>
 					<div class="inline">
 						<v-select multiple :options="getStates" v-model="selectedStates"></v-select>
+						<div class="pt-1 text-sm lg:pl-5 font-semibold" v-text="'Select or type in state names to see their respective information'"></div>
 					</div>
-					<div v-if="selectedStates">
-						<div class="flex py-4 lg:px-10 content-between">
-							<ul class="list-reset lg:flex">
-								<li class="mr-3">
-									<a class="inline-block py-1 px-3 border rounded-lg"
-									@click="rangeSelector = 1"
-									:class="{
-										'border-blue bg-blue-500 text-white' : rangeSelector === 1, 
-										'border-white hover:border-grey-lighter text-blue-500 hover:bg-grey-lighter' : rangeSelector != 1
-									}"
-									href="#">Since Last Fortnight</a>
-								</li>
-								<li class="mr-3">
-									<a class="inline-block py-1 px-3 border rounded-lg"
-									@click="rangeSelector = 2"
-									:class="{
-										'border-blue bg-blue-500 text-white' : rangeSelector === 2, 
-										'border-white hover:border-grey-lighter text-blue-500 hover:bg-grey-lighter' : rangeSelector != 2
-									}"
-									href="#">Since 1 month</a>
-								</li>
-								<li class="mr-3">
-									<a class="inline-block py-1 px-3 border rounded-lg"
-									@click="rangeSelector = 3"
-									:class="{
-										'border-blue bg-blue-500 text-white' : rangeSelector === 3, 
-										'border-white hover:border-grey-lighter text-blue-500 hover:bg-grey-lighter' : rangeSelector != 3
-									}"
-									href="#">From the beginning</a>
-								</li>
-								<li class="mr-3 inline-block py-1 px-3">
+					<div v-if="selectedStates" class="py-2 lg:px-5">
+						<div class="lg:flex lg:divide-x content-between">
+							<div class="w-1/2 py-2">
+								<div class="pt-1 text-sm font-semibold" v-text="'Select starting range for the data'"></div>
+								<ul class="list-reset lg:pl-5 lg:flex">
+									<li class="mr-3 pt-2">
+										<a class="cursor-pointer inline-block py-1 px-3 border rounded-lg"
+										@click="rangeSelector = 1"
+										:class="{
+											'border-blue bg-blue-500 text-white' : rangeSelector === 1, 
+											'border-white hover:border-grey-lighter text-blue-500 hover:bg-grey-lighter' : rangeSelector != 1
+										}" >Since Last Fortnight</a>
+									</li>
+									<li class="mr-3 pt-2">
+										<a class="cursor-pointer inline-block py-1 px-3 border rounded-lg"
+										@click="rangeSelector = 2"
+										:class="{
+											'border-blue bg-blue-500 text-white' : rangeSelector === 2, 
+											'border-white hover:border-grey-lighter text-blue-500 hover:bg-grey-lighter' : rangeSelector != 2
+										}" >Since 1 month</a>
+									</li>
+									<li class="mr-3 pt-2">
+										<a class="cursor-pointer inline-block py-1 px-3 border rounded-lg"
+										@click="rangeSelector = 3"
+										:class="{
+											'border-blue bg-blue-500 text-white' : rangeSelector === 3, 
+											'border-white hover:border-grey-lighter text-blue-500 hover:bg-grey-lighter' : rangeSelector != 3
+										}" >From the beginning</a>
+									</li>
+								</ul>
+							</div>
+							<div class="w-1/2 py-1 lg:pl-5">
+								<div class="mr-3 pt-10 px-5">
 									<span>&nbsp; Growth &nbsp;</span>
 									<toggle-button class="p-1" v-model="dataToggle" color="#38b2ac" />
 									<span>&nbsp; Cummulative &nbsp;</span>
-								</li>
-							</ul>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -120,6 +136,7 @@ export default{
 		PulseLoader,
 		ScatterChart
 	},
+	props: ['lastUpdated'],
 	data() {
 		return {
 			states: null,
@@ -130,10 +147,18 @@ export default{
 			dataToggle: true,
 			dateList: false,
 			dateRange: false,
-			rangeSelector: 1,
 			computeValues: false,
 			selectedStates: [],
-			selected: 1
+			rangeSelector: 0,
+			selector: 0,
+			countryWideConfirmedDelta: null,
+			countryWideConfirmedTotal: null,
+			countryWideActiveDelta: null,
+			countryWideActiveTotal: null,
+			countryWideRecoveredDelta: null,
+			countryWideRecoveredTotal: null,
+			countryWideRt: null,
+			chartDate: null
 		}
 	},
 
@@ -154,6 +179,8 @@ export default{
 					this.confirmedData = response.data.confirmedData;
 					this.recoveredData = response.data.recoveredData;
 					this.deceasedData = response.data.deceasedData;
+					let lastUpdated = moment(response.data.lastUpdated).format('Do-MMM-YYYY hh:mm A')
+					this.$emit('update:lastUpdated', lastUpdated);
 					resolve('Success!');
 					this.selectedStates.push(this.states.filter(record => {return record.statecode == "mh";})[0]['state']);
 				},
@@ -164,16 +191,8 @@ export default{
 			);
 		});
 		getData.then(() =>{
-			let dates = [];
-			if (this.rangeSelector == 1){
-				dates = this.dates.slice(Math.max(this.dates.length - 15, 0));
-			}else if (this.rangeSelector == 2){
-				dates = this.dates.slice(Math.max(this.dates.length - 30, 0));
-			}else {
-				dates = this.dates;
-			}
-			this.dateRange 	= [dates[0], dates.slice(-1)[0]];
-			this.dateList 	= dates.map(value=> {return moment(value).format('DD-MMM-YY')});
+			this.rangeSelector = 1;
+			this.selector = 1;
 		}, error=>{
 			console.log(error);
 		});
@@ -193,6 +212,47 @@ export default{
 			this.dateRange 	= [dates[0], dates.slice(-1)[0]];
 			this.dateList 	= dates.map(value=> {return moment(value).format('DD-MMM-YY')});
 		},
+
+		selector: function (val) {
+			let date = [];
+			if (val == 1){
+				date = this.dates.slice(-1)[0];
+			}else if (val == 2){
+				date = this.dates.slice(Math.max(this.dates.length - 15, 0))[0];
+			}else {
+				date = this.dates.slice(Math.max(this.dates.length - 30, 0))[0];
+			}
+			let filteredConfirmedData = this.confirmedData.filter(record => { return record['date'] == date });
+			let filteredActiveData = this.activeData.filter(record => { return record['date'] == date });
+			let filteredRecoveredData = this.recoveredData.filter(record => { return record['date'] == date });
+			
+			let oldDate = filteredActiveData[0]['rt_date'];
+			let filteredOldActiveData = this.activeData.filter(record => { return record['date'] == oldDate });
+			
+			this.countryWideConfirmedDelta = filteredConfirmedData.reduce(function (result, item) {
+				return result + item.delta;
+			}, 0);
+			this.countryWideActiveDelta = filteredActiveData.reduce(function (result, item) {
+				return result + item.delta;
+			}, 0);
+			this.countryWideRecoveredDelta = filteredRecoveredData.reduce(function (result, item) {
+				return result + item.delta;
+			}, 0);
+			this.countryWideConfirmedTotal = filteredConfirmedData.reduce(function (result, item) {
+				return result + item.accumulated;
+			}, 0);
+			this.countryWideActiveTotal = filteredActiveData.reduce(function (result, item) {
+				return result + item.accumulated;
+			}, 0);
+			this.countryWideRecoveredTotal = filteredRecoveredData.reduce(function (result, item) {
+				return result + item.accumulated;
+			}, 0);
+			let countryWideOldActiveTotal = filteredOldActiveData.reduce(function (result, item) {
+				return result + item.accumulated;
+			}, 0);
+			this.countryWideRt =  (this.countryWideActiveTotal / countryWideOldActiveTotal).toFixed(2);
+			this.chartDate = "Rt as of " + moment(date).format("DD-MMM-YY");
+		},
 	},
 
 	filters: {
@@ -207,19 +267,23 @@ export default{
 		first(data) {
 			return data[0];
 		},
+
+		getNumber(value) {
+			if (value > 0) {
+				return "+" + value;
+			} else {
+				return value.toString();
+			}
+		},
 	},
 
 	methods: {
-		getChartName() {
-			return "Rt-latest";
-		},
-
 		getRtData(data) {
 			let lastValues = [];
 			let date = null;
-			if (this.selected == 1){
+			if (this.selector == 1){
 				date = moment(this.dates[this.dates.length - 1]);
-			} else if (this.selected == 2) {
+			} else if (this.selector == 2) {
 				date = moment(this.dates[this.dates.length - 7]);
 			} else {
 				date = moment(this.dates[this.dates.length - 30]);
@@ -240,7 +304,6 @@ export default{
 			let states = this.states.map(x => x['state']);
 			return states.sort();
 		},
-
 	},
 };
 </script>

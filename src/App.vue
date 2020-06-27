@@ -1,8 +1,8 @@
 <template>
 	<div id="app" class="bg-gray-200">
-		<Nav :modalStatus.sync="faqModalShow" />
+		<Nav :modalStatus.sync="faqModalShow" :lastUpdated="lastUpdated" />
 		<div class="lg:flex">
-			<Content class="lg:w-3/4" />
+			<Content class="lg:w-3/4" :lastUpdated.sync="lastUpdated" />
 			<Sidebar :modalStatus.sync="faqModalShow" class="lg:w-1/4" />
 		</div>
         <faq-modal :showModal="faqModalShow" @closeModal="faqModalShow = false"></faq-modal>
@@ -24,6 +24,7 @@ export default {
 	data() {
 		return {
 			faqModalShow: false,
+			lastUpdated: null
 		};
 	}
 };

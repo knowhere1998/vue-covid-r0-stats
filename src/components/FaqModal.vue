@@ -12,7 +12,7 @@
 					@click.prevent="closeModal()"
 					tabindex="0"
 				> × </a>
-				<div v-for="question in questions" :key="question.question">
+				<div class="divide-y" v-for="question in questions" :key="question.question">
 					<Question :question="question.question" :answer="question.answer" :active="question.active" />
 				</div>
 			</div>

@@ -5,7 +5,7 @@
 <script>
 
 export default{
-	props: ['chartName', 'categories', 'data', 'type', 'height', 'showLabels'],
+	props: ['chartName', 'categories', 'data', 'type', 'height', 'showLabels', 'annotationValue'],
 
 	computed: {
 		options () {
@@ -36,7 +36,7 @@ export default{
 				},
 				annotations: {
 					yaxis: [{
-						y: 1,
+						y: this.annotationValue,
 						borderColor: '#00E396',
 						label: {
 							borderColor: '#00E396',
@@ -46,8 +46,8 @@ export default{
 								background: '#00E396'
 							},
 							orientation: 'horizontal',
-							offsetX: 0,
-							// text: 'Annotation Test'
+							offsetX: 1,
+							text: "Country Avg: " + this.annotationValue
 						}
 					}]
 				},

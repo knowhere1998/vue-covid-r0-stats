@@ -1,11 +1,34 @@
 export default {
 	'API_URL': "https://node-covid-data.herokuapp.com",
 	'questions' : [
-		{"question": "1+1", "answer": "2", "active": true},
-		{"question": "1+2", "answer": "3", "active": false},
-		{"question": "1+3", "answer": "4", "active": false},
-		{"question": "1+4", "answer": "5", "active": true},
-		{"question": "1+5", "answer": "6", "active": false},
-		{"question": "1+6", "answer": "7", "active": false},
+		{
+			"question": "What is R<sub>t</sub>/R<sub>0</sub>?",
+			"answer": " \
+				R<sub>0</sub>, pronounced “R naught,” is a mathematical term that indicates how contagious an infectious disease is. It’s also referred to as the reproduction number. As an infection is transmitted to new people, it reproduces itself."
+		},
+		{
+			"question": "Why R<sub>0</sub>?",
+			"answer": "Answer"
+		},
+		{
+			"question": "What does the 'R<sub>t</sub>' value mean?",
+			"answer": "Answer"
+		},
+		{
+			"question": "How is it calculated",
+			"answer": "Answer"
+		},
+		{
+			"question": "why 15 days?",
+			"answer": "Answer"
+		},
+		{
+			"question": "why are you developing this and why now?",
+			"answer": "Answer"
+		},
+		{
+			"question": "Test question",
+			"answer": "Answer"
+		},
 	],
 };

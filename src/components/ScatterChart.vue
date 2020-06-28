@@ -47,7 +47,7 @@ export default{
 							},
 							orientation: 'horizontal',
 							offsetX: 1,
-							text: "Country Avg: " + this.annotationValue
+							text: "Rt India: " + this.annotationValue
 						}
 					}]
 				},

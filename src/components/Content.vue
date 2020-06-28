@@ -4,8 +4,8 @@
 			<div v-if="states">
 				<div class=" border bg-white shadow-lg">
 					<div class="lg:flex">
-						<ul class="list-reset w-1/3 lg:flex align-middle px-5 py-3">
-							<li class="mr-3">
+						<ul class="list-reset w-1/3 lg:flex px-5 py-3">
+							<li class="mr-3 pt-1">
 								<a class="cursor-pointer inline-block py-1 px-3 border rounded-lg"
 								@click="selector = 1"
 								:class="{
@@ -13,7 +13,7 @@
 									'border-white hover:border-grey-lighter text-blue-500 hover:bg-grey-lighter' : selector != 1
 								}" >Latest</a>
 							</li>
-							<li class="mr-3">
+							<li class="mr-3 pt-1">
 								<a class="cursor-pointer inline-block py-1 px-3 border rounded-lg"
 								@click="selector = 2"
 								:class="{
@@ -21,7 +21,7 @@
 									'border-white hover:border-grey-lighter text-blue-500 hover:bg-grey-lighter' : selector != 2
 								}" >Last Week</a>
 							</li>
-							<li class="mr-3">
+							<li class="mr-3 pt-1">
 								<a class="cursor-pointer inline-block py-1 px-3 border rounded-lg"
 								@click="selector = 3"
 								:class="{
@@ -30,25 +30,25 @@
 								}" >1 month ago</a>
 							</li>
 						</ul>
-						<div class="w-2/3 lg:flex align-middle justify-end">
-							<div class="inline-block px-4 lg:py-5 py-4">
+						<div class="w-2/3 lg:flex justify-end">
+							<div class="inline-block lg:px-5 px-3 lg:py-5 py-2">
 								<div class="flow-root lg:text-xl sm:text-sm lg:text-center lg:font-bold text-red-800">
 									Confirmed: {{ countryWideConfirmedTotal }} ({{ countryWideConfirmedDelta | getNumber }})
 								</div>
 							</div>
-							<div class="inline-block px-4 lg:py-5 py-4">
+							<div class="inline-block lg:px-5 px-3 lg:py-5 py-2">
 								<div class="flow-root lg:text-xl sm:text-sm lg:text-center lg:font-bold text-blue-800">
 									Active: {{ countryWideActiveTotal }} ({{ countryWideActiveDelta | getNumber }})
 								</div>
 							</div>
-							<div class="inline-block px-4 lg:py-5 py-4">
+							<div class="inline-block lg:px-5 px-3 lg:py-5 py-2">
 								<div class="flow-root lg:text-xl sm:text-sm lg:text-center lg:font-bold text-green-800">
 									Recovered: {{ countryWideRecoveredTotal }} ({{ countryWideRecoveredDelta | getNumber }})
 								</div>
 							</div>
 						</div>
 					</div>
-					<div class="lg:p-5">
+					<div class="lg:p-5 pt-5">
 						<ScatterChart height=400 showLabels=true :chartName="chartDate" type= "scatter" :categories="getStates" :data="getRtData(activeData)" :annotationValue="countryWideRt" />
 					</div>
 				</div>

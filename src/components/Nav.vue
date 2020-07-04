@@ -6,8 +6,9 @@
 			</a>
 		</div>
 		<div class="info-text px-4">
-			These are average R<sub>t</sub> values compiled through the data collected daily. R<sub>t</sub>, also referred to as the reproduction number, denotes mathematical measure of a virus spread. R<sub>t</sub> tells you the average number of people who will contract a contagious disease from one person with that disease. This model was made with use of data from <a class="link"  href="https://www.covid19india.org/">covid19india.org</a> and inspired by <a class="link" href="https://www.rt.live/">rt.live</a>.
+			R<sub>t</sub> is a mathematical term that determines how contagious a particular disease is. Here, R<sub>t</sub> denotes the average number of people one person with the Coronavirus infects. It is also referred to as the reproduction number which gives us an insight into the coronavirus spread across India. The R<sub>t</sub> values displayed on the screen are average values calculated from the data collected daily. 
 			<br>
+			This model was made with use of data from <a class="link"  href="https://www.covid19india.org/">covid19india.org</a> and inspired by <a class="link" href="https://www.rt.live/">rt.live</a>.
 			Please check out the FAQs to <a class="link cursor-pointer" @click="launchModal()">Learn more.</a>
 		</div>
 		<div class="flex justify-end" v-if="lastUpdated">

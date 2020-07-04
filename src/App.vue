@@ -1,11 +1,11 @@
 <template>
 	<div id="app" class="bg-gray-200">
-		<Nav :modalStatus.sync="faqModalShow" :lastUpdated="lastUpdated" />
+		<Nav :modalStatus.sync="faqModalVisible" :lastUpdated="lastUpdated" />
 		<div class="lg:flex">
 			<Content class="lg:w-3/4" :lastUpdated.sync="lastUpdated" />
-			<Sidebar :modalStatus.sync="faqModalShow" class="lg:w-1/4" />
+			<Sidebar :modalStatus.sync="faqModalVisible" class="lg:w-1/4" />
 		</div>
-        <faq-modal :showModal="faqModalShow" @closeModal="faqModalShow = false"></faq-modal>
+        <faq-modal :showModal="faqModalVisible" @closeModal="faqModalVisible = false"></faq-modal>
 	</div>
 </template>
 
@@ -23,9 +23,18 @@ export default {
 	},
 	data() {
 		return {
-			faqModalShow: false,
+			faqModalVisible: false,
 			lastUpdated: null
 		};
+	},
+	watch: {
+		faqModalVisible: function() {
+			if(this.faqModalVisible){
+				document.documentElement.style.overflow = 'hidden'
+				return
+			}
+			document.documentElement.style.overflow = 'auto'
+		}
 	}
 };
 </script>

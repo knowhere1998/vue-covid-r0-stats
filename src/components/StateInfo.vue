@@ -39,7 +39,7 @@
 					</div>
 					<div class="sm:px-2">
 						<div class="flow-root lg:text-2xl text-center lg:font-bold text-blue-800">Rt-Trend</div>
-						<LineChart height=400 type="line" chartName="Rt-map" :dateList="dateList" color="#0000ff" :data="getRtData" />
+						<LineChart height=400 type="line" chartName="Rt-map" :dateList="dates" color="#0000ff" :data="getRtData" />
 					</div>
 				</div>
 			</div>
@@ -68,7 +68,7 @@ export default  {
 
 		getRtData() {
 			let data = this.rtData.filter(record=>{
-				return record['state'] === this.state && record['date'] >= this.dateRange[0] && record['date'] <= this.dateRange[1];
+				return record['state'] === this.state;
 			}).map(record => {
 				return (record['rt']) ? Math.abs(record['rt']) : 0;
 			});

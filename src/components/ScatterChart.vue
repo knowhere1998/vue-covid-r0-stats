@@ -21,9 +21,11 @@ export default{
 					text: this.chartName,
 				},
 				xaxis: {
+					type: 'category',
 					categories: this.categories,
 					labels: {
-						show: this.showLabels
+						rotate: -45,
+						hideOverlappingLabels: false,
 					},
 					tooltip: {
 						enabled: true

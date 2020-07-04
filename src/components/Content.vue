@@ -49,7 +49,7 @@
 						</div>
 					</div>
 					<div class="lg:p-5 pt-5">
-						<ScatterChart height=400 showLabels=true :chartName="chartDate" type= "scatter" :categories="getStates" :data="getRtData(activeData)" :annotationValue="countryWideRt" />
+						<ScatterChart height=400 showLabels=true :chartName="chartDate" type= "scatter" :categories="getStates" :data="getRtData(rtData)" :annotationValue="countryWideRt" />
 					</div>
 				</div>
 				<div class="p-4 mt-5 bg-white border shadow-lg">
@@ -104,6 +104,7 @@
 						:dateList="dateList" 
 						:confirmedData="confirmedData" 
 						:activeData="activeData" 
+						:rtData="rtData" 
 						:recoveredData="recoveredData"
 						:dateRange="dateRange"
 						:dataToggle="dataToggle"
@@ -144,6 +145,7 @@ export default{
 			confirmedData: null,
 			recoveredData: null,
 			deceasedData: null,
+			rtData: null,
 			dataToggle: true,
 			dateList: false,
 			dateRange: false,
@@ -151,11 +153,11 @@ export default{
 			selectedStates: [],
 			rangeSelector: 0,
 			selector: 0,
-			countryWideConfirmedDelta: null,
+			countryWideConfirmedDelta: 0,
 			countryWideConfirmedTotal: null,
-			countryWideActiveDelta: null,
+			countryWideActiveDelta: 0,
 			countryWideActiveTotal: null,
-			countryWideRecoveredDelta: null,
+			countryWideRecoveredDelta: 0,
 			countryWideRecoveredTotal: null,
 			countryWideRt: null,
 			chartDate: null
@@ -179,6 +181,7 @@ export default{
 					this.confirmedData = response.data.confirmedData;
 					this.recoveredData = response.data.recoveredData;
 					this.deceasedData = response.data.deceasedData;
+					this.rtData = response.data.rtData;
 					let lastUpdated = moment(response.data.lastUpdated).format('Do-MMM-YYYY hh:mm A')
 					this.$emit('update:lastUpdated', lastUpdated);
 					resolve('Success!');
@@ -225,9 +228,10 @@ export default{
 			let filteredConfirmedData = this.confirmedData.filter(record => { return record['date'] == date });
 			let filteredActiveData = this.activeData.filter(record => { return record['date'] == date });
 			let filteredRecoveredData = this.recoveredData.filter(record => { return record['date'] == date });
+			let filteredRtData = this.rtData.filter(record => { return record['date'] == date });
 			
-			let oldDate = filteredActiveData[0]['rt_date'];
-			let filteredOldActiveData = this.activeData.filter(record => { return record['date'] == oldDate });
+			let oldDate = filteredRtData[0]['rt_date'];
+			let filteredOldRtData = this.rtData.filter(record => { return record['date'] == oldDate });
 			
 			this.countryWideConfirmedDelta = filteredConfirmedData.reduce(function (result, item) {
 				return result + item.delta;
@@ -247,10 +251,13 @@ export default{
 			this.countryWideRecoveredTotal = filteredRecoveredData.reduce(function (result, item) {
 				return result + item.accumulated;
 			}, 0);
-			let countryWideOldActiveTotal = filteredOldActiveData.reduce(function (result, item) {
-				return result + item.accumulated;
+			let countryWideRtTotal = filteredRtData.reduce(function (result, item) {
+				return result + item.accumulated15;
 			}, 0);
-			this.countryWideRt =  (this.countryWideActiveTotal / countryWideOldActiveTotal).toFixed(2);
+			let countryWideOldRtTotal = filteredOldRtData.reduce(function (result, item) {
+				return result + item.accumulated15;
+			}, 0);
+			this.countryWideRt =  (countryWideRtTotal / countryWideOldRtTotal).toFixed(2);
 			this.chartDate = "Rt as of " + moment(date).format("DD-MMM-YY");
 		},
 	},

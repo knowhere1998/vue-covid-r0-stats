@@ -1,5 +1,5 @@
 <template>
-	<div class="state-info border-4 bg-white rounded-lg lg:px-4 px-2 border-gray-200 shadow-lg justify-center">
+	<div class="state-info border bg-white lg:px-4 px-2 border-gray-200 shadow-xl justify-center">
 		<div class="lg:flex justify-around py-4">
 			<h3 class="w-1/3 md:text-xl px-4 pt-4 font-bold text-xl lg:font-extrabold lg:text-5xl align-middle">{{ state }}</h3>
 			<div class="lg:flex w-2/3 align-middle justify-end">
@@ -33,13 +33,13 @@
 				<div class="container h-full items-end">
 					<div class="lg:text-4xl font-extrabold lg:text-center lg:p-16 p-8">
 						<div class="lg:pb-5 pb-2">
-							Current R<sub>t</sub> &nbsp;&nbsp;&nbsp;&nbsp; {{ rNought(state) | toFixed(3) }}
+							Current R<sub>t</sub> &nbsp;&nbsp;&nbsp;&nbsp; {{ getRtData | last }}
 						</div>
 						<div class="text-sm">(for last 15 days)</div>
 					</div>
 					<div class="sm:px-2">
 						<div class="flow-root lg:text-2xl text-center lg:font-bold text-blue-800">Rt-Trend</div>
-						<LineChart height=400 chartName="Rt-map" :dateList="getDates" color="#0000ff" :data="getRtData(activeData)" />
+						<LineChart height=400 type="line" chartName="Rt-map" :dateList="dateList" color="#0000ff" :data="getRtData" />
 					</div>
 				</div>
 			</div>
@@ -50,6 +50,7 @@
 <script lang="js">
 import LineChart from './LineChart.vue';
 import moment from 'moment';
+import _ from 'lodash';
 
 export default  {
 	name: 'state-info',
@@ -58,11 +59,20 @@ export default  {
 		LineChart,
 	},
 	
-	props: ['state', 'dates', 'dateList', 'confirmedData', 'activeData', 'recoveredData', 'dateRange', 'dataToggle', "rangeToggle"],
+	props: ['state', 'dates', 'dateList', 'confirmedData', 'activeData', 'recoveredData', 'rtData', 'dateRange', 'dataToggle', "rangeToggle"],
 
 	computed: {
 		getDates () {
 			return this.dates.map(value=> {return moment(value).format('DD-MMM-YY')});
+		},
+
+		getRtData() {
+			let data = this.rtData.filter(record=>{
+				return record['state'] === this.state && record['date'] >= this.dateRange[0] && record['date'] <= this.dateRange[1];
+			}).map(record => {
+				return (record['rt']) ? Math.abs(record['rt']) : 0;
+			});
+			return this.movingAverage(data);
 		},
 
 	},
@@ -87,21 +97,26 @@ export default  {
 			return data;
 		},
 
-		getRtData(data) {
-			data = data.filter(record=>{
-				return record['state'] === this.state;
-			}).map(record => {
-				return (record['rt']) ? record['rt'].toFixed(2): 0;
-			});
-			return data;
+		movingAverage(data) {
+			return _.chain(data)
+					.map(this.window)
+					.map(this.average)
+					.value();
 		},
 
-		rNought(state) {
-			return this.activeData.filter(record=> {
-				return record['state'] === state;
-			}).map(record => {
-				return record['rt'];
-			}).slice(-1)[0];
+		window(_number, index, array) {
+			const start = Math.max(0, index - 4);
+			const end   = Math.min(array.length, index + 4);
+			return _.slice(array, start, end);	
+		},
+	
+		average(data) {
+			const avg = this.sum(data) / (data.length || 1);
+			return avg.toFixed(3);
+		},
+
+		sum(data) {
+			return _.reduce(data, (a, b) => Number(a) + Number(b), 0);
 		},
 
 		getType() {
@@ -126,7 +141,7 @@ export default  {
 		},
 
 		last(data) {
-			return data.splice(-1)[0];
+			return data[data.length-1];
 		},
 
 		first(data) {
@@ -135,6 +150,7 @@ export default  {
 
 		toFixed(value, limit){
 			if (value){
+				console.log(value);
 				return value.toFixed(limit);
 			}else{
 				return 0;

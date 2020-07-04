@@ -7,7 +7,7 @@
 				<a class="link cursor-pointer" @click="launchModal()">FAQ</a>
 				<a class="link" :href="getAPIURL()">Data API</a>
 				<a class="link" href="https://github.com/knowhere1998/vue-covid-rt-stats/">GitHub Repository</a>
-				<a class="link" href="https://twitter.com/Kn0wh3re">Twitter</a>
+				<a class="link" href="https://twitter.com/a3darekar">Twitter</a>
 				<a class="link" href="https://linkedin.com/in/amey-darekar-47950b173/">LinkedIn</a>				
 			</div>
 		</div>

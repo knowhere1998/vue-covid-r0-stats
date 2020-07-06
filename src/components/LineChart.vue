@@ -5,7 +5,7 @@
 <script>
 
 export default{
-	props: ['chartName', 'dateList', 'data', 'color', 'type', 'height', 'showLabels'],
+	props: ['chartName', 'dateList', 'data', 'color', 'type', 'height', 'showLabels', 'annotations'],
 
 	computed: {
 		options () {
@@ -19,6 +19,7 @@ export default{
 					}
 				},
 				xaxis: {
+					type: 'datetime',
 					categories: this.dateList,
 					labels: {
 						show: this.showLabels
@@ -50,7 +51,7 @@ export default{
 			}];
 		}
 	}
-}
+};
 </script>
 
 <style scoped>

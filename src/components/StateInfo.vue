@@ -31,15 +31,17 @@
 			</div>
 			<div class="lg:w-1/2 lg:pt-6 md:pt-4 mt-2 lg:mr-5 rounded-r-lg overflow-hidden shadow-inner justify-center">
 				<div class="container h-full items-end">
-					<div class="lg:text-4xl font-extrabold lg:text-center lg:p-16 p-8">
-						<div class="lg:pb-5 pb-2">
+					<div class="font-extrabold lg:text-center lg:p-16 p-8">
+						<div class="lg:text-4xl">
 							Current R<sub>t</sub> &nbsp;&nbsp;&nbsp;&nbsp; {{ getRtData | last }}
 						</div>
-						<div class="text-sm">(for last 15 days)</div>
+						<div class="text-sm">
+							(based on last 15 days)
+						</div>
 					</div>
 					<div class="sm:px-2">
-						<div class="flow-root lg:text-2xl text-center lg:font-bold text-blue-800">Rt-Trend</div>
-						<LineChart height=400 type="line" chartName="Rt-map" :dateList="dates" color="#0000ff" :data="getRtData" />
+						<div class="flow-root lg:text-2xl text-center lg:font-bold text-blue-800">Rt-Trend (from Lockdown Phase 2)</div>
+						<LineChart height=400 type="line" chartName="Rt-map(from Lockdown Phase 2)" :dateList="rtDates" color="#0000ff" :data="getRtData" showlabels=true />
 					</div>
 				</div>
 			</div>
@@ -51,6 +53,7 @@
 import LineChart from './LineChart.vue';
 import moment from 'moment';
 import _ from 'lodash';
+import CONSTANTS from './../constants.js';
 
 export default  {
 	name: 'state-info',
@@ -66,9 +69,13 @@ export default  {
 			return this.dates.map(value=> {return moment(value).format('DD-MMM-YY')});
 		},
 
+		rtDates() {
+			return this.dates.filter(date=> {return moment(date) >= moment("15-Apr-20")});
+		},
+
 		getRtData() {
 			let data = this.rtData.filter(record=>{
-				return record['state'] === this.state;
+				return record['state'] === this.state && moment(record['date']) > moment("15-Apr-20");
 			}).map(record => {
 				return (record['rt']) ? Math.abs(record['rt']) : 0;
 			});
@@ -79,7 +86,7 @@ export default  {
 
 	data () {
 		return {
-			
+			timeline : CONSTANTS.timeline
 		}
 	},
 
@@ -179,7 +186,4 @@ export default  {
 </script>
 
 <style scoped>
-	.state-info {
-
-	}
 </style>

@@ -33,23 +33,23 @@
 						<div class="w-2/3 lg:flex justify-end">
 							<div class="inline-block lg:px-5 px-3 lg:py-5 py-2">
 								<div class="flow-root lg:text-xl sm:text-sm lg:text-center lg:font-bold text-red-800">
-									Confirmed: {{ countryWideConfirmedTotal }} ({{ countryWideConfirmedDelta | getNumber }})
+									Confirmed: {{ confirmedData | nationStats | last | accumulated }} ({{ confirmedData | nationStats | last | delta | getNumber }})
 								</div>
 							</div>
 							<div class="inline-block lg:px-5 px-3 lg:py-5 py-2">
 								<div class="flow-root lg:text-xl sm:text-sm lg:text-center lg:font-bold text-blue-800">
-									Active: {{ countryWideActiveTotal }} ({{ countryWideActiveDelta | getNumber }})
+									Active: {{ activeData | nationStats | last | accumulated }} ({{ activeData | nationStats | last | delta | getNumber }})
 								</div>
 							</div>
 							<div class="inline-block lg:px-5 px-3 lg:py-5 py-2">
 								<div class="flow-root lg:text-xl sm:text-sm lg:text-center lg:font-bold text-green-800">
-									Recovered: {{ countryWideRecoveredTotal }} ({{ countryWideRecoveredDelta | getNumber }})
+									Recovered: {{ recoveredData | nationStats | last | accumulated }} ({{ recoveredData | nationStats | last | delta | getNumber }})
 								</div>
 							</div>
 						</div>
 					</div>
 					<div class="lg:p-5 pt-5">
-						<ScatterChart height=400 showLabels=true :chartName="chartDate" type= "scatter" :categories="getStates" :data="getRtData(rtData)" :annotationValue="countryWideRt" />
+						<ScatterChart height=400 showLabels=true :chartName="chartDate" type= "scatter" :categories="stateList" :data="getRtData()" :annotationValue="nationWideRt" />
 					</div>
 				</div>
 				<div class="p-4 mt-5 bg-white border shadow-lg">
@@ -153,13 +153,7 @@ export default{
 			selectedStates: [],
 			rangeSelector: 0,
 			selector: 0,
-			countryWideConfirmedDelta: 0,
-			countryWideConfirmedTotal: null,
-			countryWideActiveDelta: 0,
-			countryWideActiveTotal: null,
-			countryWideRecoveredDelta: 0,
-			countryWideRecoveredTotal: null,
-			countryWideRt: null,
+			nationWideRt: 1,
 			chartDate: null
 		}
 	},
@@ -185,7 +179,7 @@ export default{
 					let lastUpdated = moment(response.data.lastUpdated).format('Do-MMM-YYYY hh:mm A')
 					this.$emit('update:lastUpdated', lastUpdated);
 					resolve('Success!');
-					this.selectedStates.push(this.states.filter(record => {return record.statecode == "mh";})[0]['state']);
+					this.selectedStates.push(this.states.filter(record => {return record.statecode == "in";})[0]['state']);
 				},
 				(error) => { 
 					console.log(error);
@@ -225,39 +219,7 @@ export default{
 			}else {
 				date = this.dates.slice(Math.max(this.dates.length - 30, 0))[0];
 			}
-			let filteredConfirmedData = this.confirmedData.filter(record => { return record['date'] == date });
-			let filteredActiveData = this.activeData.filter(record => { return record['date'] == date });
-			let filteredRecoveredData = this.recoveredData.filter(record => { return record['date'] == date });
-			let filteredRtData = this.rtData.filter(record => { return record['date'] == date });
 			
-			let oldDate = filteredRtData[0]['rt_date'];
-			let filteredOldRtData = this.rtData.filter(record => { return record['date'] == oldDate });
-			
-			this.countryWideConfirmedDelta = filteredConfirmedData.reduce(function (result, item) {
-				return result + item.delta;
-			}, 0);
-			this.countryWideActiveDelta = filteredActiveData.reduce(function (result, item) {
-				return result + item.delta;
-			}, 0);
-			this.countryWideRecoveredDelta = filteredRecoveredData.reduce(function (result, item) {
-				return result + item.delta;
-			}, 0);
-			this.countryWideConfirmedTotal = filteredConfirmedData.reduce(function (result, item) {
-				return result + item.accumulated;
-			}, 0);
-			this.countryWideActiveTotal = filteredActiveData.reduce(function (result, item) {
-				return result + item.accumulated;
-			}, 0);
-			this.countryWideRecoveredTotal = filteredRecoveredData.reduce(function (result, item) {
-				return result + item.accumulated;
-			}, 0);
-			let countryWideRtTotal = filteredRtData.reduce(function (result, item) {
-				return result + item.accumulated15;
-			}, 0);
-			let countryWideOldRtTotal = filteredOldRtData.reduce(function (result, item) {
-				return result + item.accumulated15;
-			}, 0);
-			this.countryWideRt =  (countryWideRtTotal / countryWideOldRtTotal).toFixed(2);
 			this.chartDate = "Rt as of " + moment(date).format("DD-MMM-YY");
 		},
 	},
@@ -275,6 +237,21 @@ export default{
 			return data[0];
 		},
 
+		nationStats(data) {
+			if (data){
+				return data.filter(entry=> {return entry.state === "India"});
+			}
+			return null;
+		},
+
+		accumulated(value) {
+			return value['accumulated']
+		},
+
+		delta(value) {
+			return value['delta']
+		},
+
 		getNumber(value) {
 			if (value > 0) {
 				return "+" + value;
@@ -285,7 +262,7 @@ export default{
 	},
 
 	methods: {
-		getRtData(data) {
+		getRtData() {
 			let lastValues = [];
 			let date = null;
 			if (this.selector == 1){
@@ -295,13 +272,18 @@ export default{
 			} else {
 				date = moment(this.dates[this.dates.length - 30]);
 			}
-			this.getStates.forEach(state=>{
-				let lastValue = data.filter(record=>{
+			this.stateList.forEach(state=>{
+				let lastValue = this.rtData.filter(record=>{
 					return record['state'] === state && date.isSame(record['date']);
 				}).splice(-1)[0];
-				lastValue = (lastValue['rt']) ? lastValue['rt'].toFixed(2): 0;
+				lastValue = (lastValue['rt']) ? lastValue['rt'].toFixed(3): 0;
 				lastValues.push(lastValue);
 			});
+			let data = this.rtData.filter(record=>{
+				return record['state'] === 'India' && date.isSame(record['date']);
+			});
+			data = data[data.length-1];
+			this.nationWideRt = (data['rt']) ? data['rt'].toFixed(3): 0;
 			return lastValues;
 		},
 	},
@@ -309,6 +291,11 @@ export default{
 	computed: {
 		getStates() {
 			let states = this.states.map(x => x['state']);
+			return states.sort();
+		},
+
+		stateList() {
+			let states = this.states.filter(state=> { return state.statecode!= "in"}).map(x => x['state']);
 			return states.sort();
 		},
 	},

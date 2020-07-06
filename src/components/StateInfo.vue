@@ -1,5 +1,5 @@
 <template>
-	<div class="state-info border bg-white lg:px-4 px-2 border-gray-200 shadow-xl justify-center">
+	<div class="state-info bg-white lg:px-4 px-2 rounded-lg shadow-2xl justify-center">
 		<div class="lg:flex justify-around py-4">
 			<h3 class="w-1/3 md:text-xl px-4 pt-4 font-bold text-xl lg:font-extrabold lg:text-5xl align-middle">{{ state }}</h3>
 			<div class="lg:flex w-2/3 align-middle justify-end">
@@ -21,7 +21,7 @@
 			</div>
 		</div>
 		<div class="lg:flex">
-			<div class="lg:w-1/2 lg:pt-6 md:pt-4 mt-2 lg:ml-5 rounded-l-lg overflow-hidden shadow-inner justify-center">
+			<div class="lg:w-1/2 lg:pt-6 md:pt-4 mt-2 lg:ml-5 rounded-l-lg overflow-hidden justify-center">
 				<div class="flow-root text-center lg:font-bold text-red-800">Confirmed Cases</div>
 					<LineChart height=200 showLabels=true chartName="Confirmed Cases" :type= "getType()" :dateList="dateList" color="#ff0000" :data="getMapData(confirmedData)" />
 				<div class="flow-root text-center lg:font-bold text-blue-800">Active Cases</div>
@@ -29,9 +29,9 @@
 				<div class="flow-root text-center lg:font-bold text-green-800">Recovered Cases</div>
 					<LineChart height=200 showLabels=true chartName="Recovered Cases" :type= "getType()" :dateList="dateList" color="#00ff00" :data="getMapData(recoveredData)" />
 			</div>
-			<div class="lg:w-1/2 lg:pt-6 md:pt-4 mt-2 lg:mr-5 rounded-r-lg overflow-hidden shadow-inner justify-center">
+			<div class="lg:w-1/2 lg:pt-6 md:pt-4 mt-2 lg:mr-5 rounded-r-lg overflow-hidden justify-center">
 				<div class="container h-full items-end">
-					<div class="font-extrabold lg:text-center lg:p-16 p-8">
+					<div class="font-extrabold lg:text-center lg:p-12 p-8">
 						<div class="lg:text-4xl">
 							Current R<sub>t</sub> &nbsp;&nbsp;&nbsp;&nbsp; {{ getRtData | last }}
 						</div>
@@ -39,8 +39,9 @@
 							(based on last 15 days)
 						</div>
 					</div>
-					<div class="sm:px-2">
-						<div class="flow-root lg:text-2xl text-center lg:font-bold text-blue-800">Rt-Trend (from Lockdown Phase 2)</div>
+					<div class="sm:px-2 flex-row">
+						<div class="flow-root lg:text-2xl text-center lg:font-bold text-blue-800">Rt-Trend</div>
+						<div class="flow-root text-center lg:font-bold text-blue-800 lg:text-sm">(From beginning of Lockdown Phase 2)</div>
 						<LineChart height=400 type="line" chartName="Rt-map(from Lockdown Phase 2)" :dateList="rtDates" color="#0000ff" :data="getRtData" showlabels=true />
 					</div>
 				</div>

@@ -4,7 +4,7 @@
 			class="fixed inset-0 w-full h-screen flex items-center justify-center bg-gray-300 bg-opacity-75"
 			@click.self="closeModal()"
 			v-if="showModal">
-			<div class="w-full lg:max-w-3xl my-4 bg-white relative shadow-lg rounded-lg p-8">
+			<div class="modal-container overflow-y-auto w-full relative max-h-screen lg:max-w-5xl my-4 bg-white shadow-lg rounded-lg p-8">
 				<h1 class="text-3xl mb-5">FAQs</h1>
 				<a
 					aria-label="close"

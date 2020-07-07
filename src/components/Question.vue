@@ -2,7 +2,7 @@
 	<div class="my-2 flex">
 		<div class="mr-4 cursor-pointer">
 			<button 
-				class="border border-solid border-gray-dark rounded-full w-8 h-8 flex items-center justify-center text-xs text-grey-dark font-bold leading-none cursor-pointer"
+				class="border border-solid border-gray-dark rounded-full w-8 h-8 flex items-center justify-center text-xs text-grey-dark font-bold cursor-pointer"
 				@click="isOpen =! isOpen"
 			>
 				<svg v-if="isOpen" xmlns="http://www.w3.org/2000/svg" width="12" height="16" viewBox="0 0 12 16" class="fill-current">
@@ -13,9 +13,9 @@
 				</svg>
 			</button>
 		</div>
-		<div class="leading-loose">
+		<div class="leading-6">
 			<h3 
-				class="font-semibold text-xl pt-1 mb-3 text-black leading-none cursor-pointer" 
+				class="font-semibold text-xl pt-1 mb-3 text-black cursor-pointer" 
 				v-html="question"
 				@click= "isOpen = ! isOpen"
 			></h3>

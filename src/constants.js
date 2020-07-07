@@ -29,7 +29,7 @@ export default {
 		},
 		{
 			"question": "How is it calculated?",
-			"answer": "<p>Head over to <a style='color: red; text-decoration: underline red;' href='https://node-covid-data.herokuapp.com/'>Data API documentation</a> to know how these values are calculated.</p>"
+			"answer": "<p>The current model follows the basic formula for calculating values for Rt. To get the average number of the people infected by currently active cases, number of newly detected cases are calcualted for the incubation period and then divided by the number of active cases before the current incubation period cycle. Since the values keep changing as number of active cases grow and decrease over the time, we calculate a rolling average of 4 days to smooth out the Rt Trend in the graph for respective region.</p><p>The data represent here is taken from <a style='color: red; text-decoration: underline red;' href='https://www.covid19india.org/'>covid19india.org</a>, and then processed to sort and accumulate additional information required to calculate these values. Head over to <a style='color: red; text-decoration: underline red;' href='https://node-covid-data.herokuapp.com/'>Data API documentation</a> to know how these values are calculated.</p>"
 		},
 		{
 			"question": "why 15 days?",

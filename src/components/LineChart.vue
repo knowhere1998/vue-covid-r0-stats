@@ -19,7 +19,6 @@ export default{
 					}
 				},
 				xaxis: {
-					type: 'datetime',
 					categories: this.dateList,
 					labels: {
 						show: this.showLabels

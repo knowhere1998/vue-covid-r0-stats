@@ -1,6 +1,6 @@
 <template>
 	<div class="pl-8 pt-8 lg:w-3/4">
-		<div class="font-extrabold flow-root pb-4 text-3xl lg:text-4xl">
+		<div class="font-extrabold flow-root text-3xl lg:text-4xl">
 			<a href="/">
 				R<sub>t</sub> Covid-19 India
 			</a>
@@ -11,7 +11,7 @@
 			This model was made with use of data from <a class="link" href="https://www.covid19india.org/">covid19india.org</a> and inspired by <a class="link" href="https://www.rt.live/">rt.live</a>.
 			Please check out the FAQs to <a class="link cursor-pointer" @click="launchModal()">Learn more.</a>
 		</div>
-		<div class="flex justify-end" v-if="lastUpdated">
+		<div class="flex justify-end my-4" v-if="lastUpdated">
 			<div class="bg-red-600 text-white font-bold text-sm border-white rounded p-1 mr-5">
 				Last updated at: {{ lastUpdated }}</div>
 			</div>

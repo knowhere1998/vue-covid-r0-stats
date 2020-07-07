@@ -256,7 +256,7 @@ export default{
 			if (value > 0) {
 				return "+" + value;
 			} else {
-				return value.toString();
+				return value;
 			}
 		},
 	},

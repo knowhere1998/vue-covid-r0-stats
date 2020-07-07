@@ -1,14 +1,14 @@
 <template lang="html">
 	<aside>
 		<div class="w-full lg:flex lg:flex-col lg:sticky lg:top-0">
-			<div class="border bg-white lg:flex lg:flex-col shadow-xl mt-4 p-6">
+			<div class="border bg-white lg:flex lg:flex-col shadow-xl my-2 mx-2 p-6">
 				<p class="text-xl font-semibold pl-2 mb-5">About this site</p>
 				<p class="mb-2">These stats do not represent exact values for reproduction number according to R<sub>t</sub> and keep changing daily as the model is implemented on time partitioned data using basic reproduction number method. It provides an insight to progression of the virus in India as of today, starting from the beginning of the pandemic.</p>
 				<a class="link link-underlined cursor-pointer" @click="launchModal()">FAQs</a>
 				<a class="link link-underlined" :href="getAPIURL()">Recompiled data API</a>
 				<a class="link link-underlined" href="https://github.com/knowhere1998/vue-covid-rt-stats/">GitHub Repository</a>
 			</div>
-			<div class="border bg-white lg:flex lg:flex-col shadow-xl mt-4 p-6">
+			<div class="border bg-white lg:flex lg:flex-col shadow-xl my-2 mx-2 p-6">
 				<p class="text-xl font-semibold pl-2 mx-auto mb-5">Site made by
 					<a class="link" href="https://about.me/a3darekar">a3darekar</a>
 				</p>

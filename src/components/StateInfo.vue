@@ -71,7 +71,11 @@ export default  {
 		},
 
 		rtDates() {
-			return this.dates.filter(date=> {return moment(date) >= moment("15-Apr-20")});
+			return this.dates.filter(date=> {
+				return moment(date) >= moment("15-Apr-20");
+			}).map(value=> {
+				return moment(value).format('DD-MMM');
+			});
 		},
 
 		getRtData() {

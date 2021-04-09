@@ -121,7 +121,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="p-10 text-center font-bold" v-else>
+		<div class="p-10 text-center font-bold" v-if="! loadingData">
 			<div class="p-10 text-2xl">
 				Something went Wrong. Try again or contact the developers.
 			</div>

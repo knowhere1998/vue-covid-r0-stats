@@ -1,6 +1,12 @@
 <template>
 	<div id="Content">
-		<div class="lg:p-4"	v-if="activeData">
+		<div class="p-10 text-center font-bold" v-if="loadingData">
+			<div class="p-10 text-2xl">
+				Please wait while we crunch the data!
+			</div>
+			<pulse-loader :loading="loadingData" size="20px"></pulse-loader>
+		</div>
+		<div class="lg:p-4"	v-if="rtData">
 			<div v-if="states">
 				<div class=" border bg-white shadow-lg">
 					<div class="lg:flex">
@@ -30,7 +36,7 @@
 								}" >1 month ago</a>
 							</li>
 						</ul>
-						<div class="w-2/3 lg:flex justify-end">
+						<div class="w-2/3 lg:flex justify-end" v-if="loadingStats">
 							<div class="inline-block lg:px-5 px-3 lg:py-5 py-2">
 								<div class="flow-root lg:text-xl sm:text-sm lg:text-center lg:font-bold text-red-800">
 									Confirmed: {{ confirmedData | nationStats | last | accumulated }} ({{ confirmedData | nationStats | last | delta | getNumber }})
@@ -47,6 +53,7 @@
 								</div>
 							</div>
 						</div>
+
 					</div>
 					<div class="lg:p-5 pt-5">
 						<ScatterChart height=400 showLabels=true :chartName="chartDate" type= "scatter" :categories="stateList" :data="getRtData()" :annotationValue="nationWideRt" />
@@ -57,7 +64,7 @@
 						<v-select multiple :options="getStates" v-model="selectedStates"></v-select>
 						<div class="pt-1 text-sm lg:pl-5 font-semibold" v-text="'Select or type in state names to see their respective information'"></div>
 					</div>
-					<div v-if="selectedStates" class="py-2 lg:px-5">
+					<div v-if="loadingStats && selectedStates" class="py-2 lg:px-5">
 						<div class="lg:flex lg:divide-x content-between">
 							<div class="w-1/2 py-2">
 								<div class="pt-1 text-sm font-semibold" v-text="'Select starting range for the data'"></div>
@@ -116,9 +123,8 @@
 		</div>
 		<div class="p-10 text-center font-bold" v-else>
 			<div class="p-10 text-2xl">
-				Please wait while we crunch the data!
+				Something went Wrong. Try again or contact the developers.
 			</div>
-			<pulse-loader :loading="! activeData" size="20px"></pulse-loader>
 		</div>
 	</div>
 </template>
@@ -140,6 +146,8 @@ export default{
 	props: ['lastUpdated'],
 	data() {
 		return {
+			loadingData: true,
+			loadingStats: true,
 			states: null,
 			activeData: null,
 			confirmedData: null,
@@ -161,7 +169,7 @@ export default{
 	mounted(){
 		let getData = new Promise((resolve, reject) => {
 			axios.get(
-					CONSTANTS.API_URL + '/json', {
+					CONSTANTS.API_URL + '/data', {
 						headers: {
 							"Access-Control-Allow-Origin": "*",
 							"Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS",
@@ -169,13 +177,13 @@ export default{
 						}
 					}
 			).then(response => {
+					// this.activeData = response.data.activeData;
+					// this.confirmedData = response.data.confirmedData;
+					// this.recoveredData = response.data.recoveredData;
+					// this.deceasedData = response.data.deceasedData;
+					this.rtData = response.data.rtData;
 					this.dates = response.data.dates;
 					this.states = response.data.states;
-					this.activeData = response.data.activeData;
-					this.confirmedData = response.data.confirmedData;
-					this.recoveredData = response.data.recoveredData;
-					this.deceasedData = response.data.deceasedData;
-					this.rtData = response.data.rtData;
 					let lastUpdated = moment(response.data.lastUpdated).format('Do-MMM-YYYY hh:mm A')
 					this.$emit('update:lastUpdated', lastUpdated);
 					resolve('Success!');
@@ -187,9 +195,37 @@ export default{
 				}
 			);
 		});
+		let getStats = new Promise((resolve, reject) => {
+			axios.get(
+					CONSTANTS.API_URL + '/stats', {
+						headers: {
+							"Access-Control-Allow-Origin": "*",
+							"Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS",
+							"Access-Control-Allow-Headers": "Origin, Content-Type, X-Auth-Token"
+						}
+					}
+			).then(response => {
+					this.activeData = response.data.activeData;
+					this.confirmedData = response.data.confirmedData;
+					this.recoveredData = response.data.recoveredData;
+					this.deceasedData = response.data.deceasedData;
+					resolve('Success!');
+				},
+				(error) => { 
+					console.log(error);
+					reject('Error!');
+				}
+			);
+		});
+		this.loadingData = false;
 		getData.then(() =>{
 			this.rangeSelector = 1;
 			this.selector = 1;
+			getStats().then(() =>{
+				this.loadingStats = false
+			}, error =>{
+				console.log(error);
+			});
 		}, error=>{
 			console.log(error);
 		});

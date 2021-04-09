@@ -6,7 +6,7 @@
 			</div>
 			<pulse-loader :loading="loadingData" size="20px"></pulse-loader>
 		</div>
-		<div class="lg:p-4"	v-if="rtData">
+		<div class="lg:p-4"	v-else-if="rtData">
 			<div v-if="states">
 				<div class=" border bg-white shadow-lg">
 					<div class="lg:flex">
@@ -121,7 +121,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="p-10 text-center font-bold" v-if="! loadingData">
+		<div class="p-10 text-center font-bold" v-else>
 			<div class="p-10 text-2xl">
 				Something went Wrong. Try again or contact the developers.
 			</div>

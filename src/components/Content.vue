@@ -217,10 +217,10 @@ export default{
 				}
 			);
 		});
-		this.loadingData = false;
 		getData.then(() =>{
 			this.rangeSelector = 1;
 			this.selector = 1;
+			this.loadingData = false;
 			getStats().then(() =>{
 				this.loadingStats = false
 			}, error =>{

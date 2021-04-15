@@ -121,7 +121,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="p-10 text-center font-bold" v-else>
+		<div class="p-10 text-center font-bold" v-if="loadingError">
 			<div class="p-10 text-2xl">
 				Something went Wrong. Try again or contact the developers.
 			</div>
@@ -148,6 +148,7 @@ export default{
 		return {
 			loadingData: true,
 			loadingStats: true,
+			loadingError: false,
 			states: null,
 			activeData: null,
 			confirmedData: null,
@@ -177,10 +178,6 @@ export default{
 						}
 					}
 			).then(response => {
-					// this.activeData = response.data.activeData;
-					// this.confirmedData = response.data.confirmedData;
-					// this.recoveredData = response.data.recoveredData;
-					// this.deceasedData = response.data.deceasedData;
 					this.rtData = response.data.rtData;
 					this.dates = response.data.dates;
 					this.states = response.data.states;
@@ -188,8 +185,10 @@ export default{
 					this.$emit('update:lastUpdated', lastUpdated);
 					resolve('Success!');
 					this.selectedStates.push(this.states.filter(record => {return record.statecode == "in";})[0]['state']);
+					this.loadingStats = false;
 				},
 				(error) => { 
+					this.loadingError = true;
 					console.log(error);
 					reject('Error!');
 				}
@@ -210,9 +209,11 @@ export default{
 					this.recoveredData = response.data.recoveredData;
 					this.deceasedData = response.data.deceasedData;
 					resolve('Success!');
+					this.loadingData = false;
 				},
 				(error) => { 
 					console.log(error);
+					this.loadingError = true;
 					reject('Error!');
 				}
 			);
@@ -220,16 +221,13 @@ export default{
 		getData.then(() =>{
 			this.rangeSelector = 1;
 			this.selector = 1;
-			this.loadingData = false;
-			getStats().then(() =>{
-				this.loadingStats = false
+			getStats.then(() =>{
 			}, error =>{
 				console.log(error);
 			});
 		}, error=>{
 			console.log(error);
 		});
-	
 	},
 
 	watch: {
@@ -258,6 +256,13 @@ export default{
 			
 			this.chartDate = "Rt as of " + moment(date).format("DD-MMM-YY");
 		},
+
+		loadingError: function (val) {
+			if (val == true){
+				this.loadingData = false;
+				this.loadingStats = false;
+			} 
+		}
 	},
 
 	filters: {

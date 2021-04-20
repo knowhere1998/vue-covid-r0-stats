@@ -36,7 +36,7 @@
 								}" >1 month ago</a>
 							</li>
 						</ul>
-						<div class="w-2/3 lg:flex justify-end" v-if="loadingStats">
+						<div class="w-2/3 lg:flex justify-end" v-if="! loadingStats">
 							<div class="inline-block lg:px-5 px-3 lg:py-5 py-2">
 								<div class="flow-root lg:text-xl sm:text-sm lg:text-center lg:font-bold text-red-800">
 									Confirmed: {{ confirmedData | nationStats | last | accumulated }} ({{ confirmedData | nationStats | last | delta | getNumber }})
@@ -64,7 +64,7 @@
 						<v-select multiple :options="getStates" v-model="selectedStates"></v-select>
 						<div class="pt-1 text-sm lg:pl-5 font-semibold" v-text="'Select or type in state names to see their respective information'"></div>
 					</div>
-					<div v-if="loadingStats && selectedStates" class="py-2 lg:px-5">
+					<div v-if="! loadingStats && selectedStates" class="py-2 lg:px-5">
 						<div class="lg:flex lg:divide-x content-between">
 							<div class="w-1/2 py-2">
 								<div class="pt-1 text-sm font-semibold" v-text="'Select starting range for the data'"></div>
